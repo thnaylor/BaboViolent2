@@ -472,7 +472,7 @@ int main(int argc, const char* argv[])
 
 	printf("***************************************\n");
 	printf("*   Babo Violent 2 Dedicated Server   *\n");
-	printf("*   Version 2.11d                     *\n");
+	printf("*   Version %-26s*\n", BV2_RELEASE_STRING);
 	printf("*                                     *\n");
 	printf("* check the /main/LaunchScript files  *\n");
 	printf("* to configure your server            *\n");
