@@ -3,7 +3,7 @@
 #define BV2_VERSION_H
 
 // Game release version (start from 2.11.0)
-#define BV2_RELEASE_STRING "2.11.0"
+#define BV2_RELEASE_STRING "3.0.1"
 
 // Babonet library version expected by the client/server
 #define BBNET_VERSION_STRING "4.0"
