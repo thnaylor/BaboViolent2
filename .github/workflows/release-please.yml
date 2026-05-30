@@ -1,4 +1,4 @@
-name: release-please
+name: Release Pipeline
 
 on:
   push:
@@ -11,15 +11,101 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: release-please-${{ github.ref }}
+  group: release-pipeline-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release-please.outputs.release_created }}
+      tag_name: ${{ steps.release-please.outputs.tag_name }}
     steps:
-      - uses: googleapis/release-please-action@v4
+      - id: release-please
+        uses: googleapis/release-please-action@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           config-file: .github/release-please-config.json
           manifest-file: .github/.release-please-manifest.json
+
+  update-version:
+    name: Update Version.h
+    runs-on: ubuntu-latest
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: true
+
+      - name: Update src/Version.h
+        env:
+          TAG: ${{ needs.release-please.outputs.tag_name }}
+        run: |
+          set -euo pipefail
+          VERSION=${TAG#v}
+          echo "Updating src/Version.h to ${VERSION}"
+          perl -0777 -pe "s/#define BV2_RELEASE_STRING \".*?\"/#define BV2_RELEASE_STRING \"${VERSION}\"/s" -i src/Version.h
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/Version.h
+          git commit -m "chore(release): set BV2 release string to ${{ needs.release-please.outputs.tag_name }}" || echo "no change to commit"
+          git push
+
+  release-build:
+    name: Release (${{ matrix.platform }})
+    runs-on: ubuntu-22.04
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            archive: zip
+          - platform: windows
+            archive: zip
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential cmake pkg-config \
+            libgl1-mesa-dev libglu1-mesa-dev \
+            libsdl2-mixer-dev \
+            g++-mingw-w64-x86-64 mingw-w64-tools \
+            sqlite3 zip
+
+      - name: Build (${{ matrix.platform }})
+        env:
+          BV2_PLATFORM: ${{ matrix.platform }}
+          BUILD: ${{ github.workspace }}/build-${{ matrix.platform }}
+          OSXCROSS_SDK_VERSION: "12.3"
+        run: bash ./scripts/ci-build.sh
+
+      - name: Package (${{ matrix.platform }})
+        env:
+          BUILD: ${{ github.workspace }}/build-${{ matrix.platform }}
+          BV2_PLATFORM: ${{ matrix.platform }}
+          BV2_ARCHIVE: ${{ matrix.archive }}
+          OSXCROSS_SDK_VERSION: "12.3"
+        run: bash ./scripts/package-release.sh
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release-please.outputs.tag_name }}
+          files: dist/*
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
