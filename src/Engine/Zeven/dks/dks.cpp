@@ -846,7 +846,11 @@ void FSOUND_SetSFXMasterVolume(int vol)
 	if (sdl_mixer_ready)
 	{
 		const int mixVol = (vol * MIX_MAX_VOLUME) / 255;
+        #if SDL_MIXER_VERSION_ATLEAST(2,6,0)
 		Mix_MasterVolume(mixVol);
+        #else
+        Mix_Volume(-1, mixVol);
+        #endif
 		Mix_VolumeMusic(mixVol);
 	}
 #endif
