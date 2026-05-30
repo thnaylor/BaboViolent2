@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/Jmainguy/BaboViolent2/compare/v3.0.0...v3.0.1) (2026-05-30)
+
+
+### Bug Fixes
+
+* **ci:** support older SDL_mixer and upgrade checkout action ([5770a00](https://github.com/Jmainguy/BaboViolent2/commit/5770a000c9c18f65c2ca19de520045502f6fefb2))
+
 ## [3.0.0](https://github.com/Jmainguy/BaboViolent2/compare/v2.11.0...v3.0.0) (2026-05-30)
 
 
