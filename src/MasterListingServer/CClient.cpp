@@ -127,7 +127,17 @@ cClient::cClient(const char *HostIP, unsigned short port,unsigned long netID)
 	isConnected			=	false;
 	Connection			=	0;
 
-	RemoteIP.sin_addr.s_addr	=	inet_addr(HostIP);
+	unsigned long resolvedAddr = inet_addr(HostIP);
+	if (resolvedAddr == INADDR_NONE)
+	{
+		hostent* host = gethostbyname(HostIP);
+		if (host && host->h_addr_list && host->h_addr_list[0])
+		{
+			resolvedAddr = ((in_addr*)host->h_addr_list[0])->s_addr;
+		}
+	}
+
+	RemoteIP.sin_addr.s_addr	=	resolvedAddr;
 	RemoteIP.sin_family			=	AF_INET;
 	RemoteIP.sin_port			=	htons(port);
 	memset(&(RemoteIP.sin_zero), '\0', 8);
