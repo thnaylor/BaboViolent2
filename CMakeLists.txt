@@ -214,6 +214,11 @@ if(WIN32)
     list(APPEND libs ${BV2_WIN32_LIBS})
 endif()
 
+if(UNIX AND NOT APPLE)
+    find_package(Threads REQUIRED)
+    list(APPEND libs Threads::Threads ${CMAKE_DL_LIBS})
+endif()
+
 if(APPLE)
     add_definitions(-D__MACOSX__)
 endif()
