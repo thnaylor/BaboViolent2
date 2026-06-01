@@ -89,3 +89,74 @@ jobs:
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-build-linux-servers:
+    name: Release servers (${{ matrix.distro }})
+    runs-on: ubuntu-latest
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Supported Debian releases as of 2026-06-01.
+          - distro: debian-13-trixie
+            image: debian:trixie-slim
+          - distro: debian-12-bookworm
+            image: debian:bookworm-slim
+          - distro: debian-11-bullseye
+            image: debian:bullseye-slim
+          # Supported Fedora releases as of 2026-06-01 (42 EOL 2026-05-13).
+          - distro: fedora-44
+            image: fedora:44
+          - distro: fedora-43
+            image: fedora:43
+    container:
+      image: ${{ matrix.image }}
+    steps:
+      - name: Install git for checkout
+        run: |
+          set -euo pipefail
+          if command -v apt-get >/dev/null; then
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update
+            apt-get install -y --no-install-recommends ca-certificates git
+          else
+            dnf install -y ca-certificates git
+          fi
+
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Set release version from tag
+        env:
+          TAG: ${{ needs.release-please.outputs.tag_name }}
+        run: |
+          set -euo pipefail
+          VERSION=${TAG#v}
+          echo "Using release version ${VERSION} for build artifacts"
+          perl -0777 -pe "s/#define BV2_RELEASE_STRING \".*?\"/#define BV2_RELEASE_STRING \"${VERSION}\"/s" -i src/Version.h
+
+      - name: Install build dependencies
+        run: bash ./scripts/ci-install-linux-deps.sh
+
+      - name: Build BaboViolentDedicated + BaboMasterServer
+        env:
+          BUILD: ${{ github.workspace }}/build-${{ matrix.distro }}
+        run: bash ./scripts/ci-build-servers.sh
+
+      - name: Package dedicated + master (${{ matrix.distro }})
+        env:
+          BUILD: ${{ github.workspace }}/build-${{ matrix.distro }}
+          BV2_DISTRO: ${{ matrix.distro }}
+        run: bash ./scripts/package-linux-servers-release.sh
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ needs.release-please.outputs.tag_name }}
+          files: dist/*
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

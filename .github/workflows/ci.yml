@@ -6,6 +6,51 @@ on:
   pull_request:
 
 jobs:
+  build-linux-servers:
+    name: Servers (${{ matrix.distro }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Supported Debian releases as of 2026-06-01.
+          - distro: debian-13-trixie
+            image: debian:trixie-slim
+          - distro: debian-12-bookworm
+            image: debian:bookworm-slim
+          - distro: debian-11-bullseye
+            image: debian:bullseye-slim
+          # Supported Fedora releases as of 2026-06-01 (42 EOL 2026-05-13).
+          - distro: fedora-44
+            image: fedora:44
+          - distro: fedora-43
+            image: fedora:43
+    container:
+      image: ${{ matrix.image }}
+    steps:
+      - name: Install git for checkout
+        run: |
+          set -euo pipefail
+          if command -v apt-get >/dev/null; then
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update
+            apt-get install -y --no-install-recommends ca-certificates git
+          else
+            dnf install -y ca-certificates git
+          fi
+
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install build dependencies
+        run: bash ./scripts/ci-install-linux-deps.sh
+
+      - name: Build BaboViolentDedicated + BaboMasterServer
+        env:
+          BUILD: ${{ github.workspace }}/build-${{ matrix.distro }}
+        run: bash ./scripts/ci-build-servers.sh
+
   build:
     name: Build (${{ matrix.platform }})
     runs-on: ubuntu-latest

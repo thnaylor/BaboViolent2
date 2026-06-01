@@ -8,11 +8,15 @@
 # Optional:
 #   BV2_ARCH=x86_64|arm64|aarch64   (default: detected)
 #   BV2_ARCHIVE=tar.gz|zip          (default: tar.gz on unix, zip on windows)
+#   BV2_DISTRO=debian-12-bookworm   (optional label for native Linux distro builds)
+#   BV2_SERVER_ONLY=1               (package dedicated + master only; skip client)
 #
 # Output (examples):
 #   dist/BaboViolent-client-linux-x86_64.tar.gz
 #   dist/BaboViolent-dedicated-linux-x86_64.tar.gz
 #   dist/BaboMasterServer-linux-x86_64.tar.gz
+#   dist/BaboViolent-dedicated-debian-12-bookworm-x86_64.tar.gz
+#   dist/BaboMasterServer-fedora-44-x86_64.tar.gz
 
 set -euo pipefail
 
@@ -42,6 +46,9 @@ BV2_ARCHIVE="${BV2_ARCHIVE:-}"
 if [[ -z "$BV2_ARCHIVE" ]]; then
 	[[ "$BV2_PLATFORM" == windows ]] && BV2_ARCHIVE=zip || BV2_ARCHIVE=tar.gz
 fi
+
+BV2_SERVER_ONLY="${BV2_SERVER_ONLY:-0}"
+BV2_RELEASE_LABEL="${BV2_DISTRO:-$BV2_PLATFORM}"
 
 die() { echo "error: $*" >&2; exit 1; }
 
@@ -112,10 +119,19 @@ if [[ -n "$RELEASE_TAG" ]]; then
 	perl -0777 -pe "s/#define BV2_RELEASE_STRING \".*?\"/#define BV2_RELEASE_STRING \"${NORM}\"/s" -i "$ROOT/src/Version.h"
 fi
 
-if ! bin_exists "$MASTER_BIN" || ! bin_exists "$DED_BIN" || ! bin_exists "$CLI_BIN"; then
-	echo "Binaries missing; running scripts/ci-build.sh..."
-	export BV2_PLATFORM BUILD
-	bash "$ROOT/scripts/ci-build.sh"
+need_client=1
+[[ "$BV2_SERVER_ONLY" == 1 ]] && need_client=0
+
+if ! bin_exists "$MASTER_BIN" || ! bin_exists "$DED_BIN" || { [[ "$need_client" == 1 ]] && ! bin_exists "$CLI_BIN"; }; then
+	if [[ "$BV2_SERVER_ONLY" == 1 ]]; then
+		echo "Binaries missing; running scripts/ci-build-servers.sh..."
+		export BUILD
+		bash "$ROOT/scripts/ci-build-servers.sh"
+	else
+		echo "Binaries missing; running scripts/ci-build.sh..."
+		export BV2_PLATFORM BUILD
+		bash "$ROOT/scripts/ci-build.sh"
+	fi
 	BUILD="$(resolve_windows_build_dir "${BUILD:-$ROOT/build-${BV2_PLATFORM}}")"
 	MASTER_BIN="$BUILD/$(exe_name BaboMasterServer)"
 	DED_BIN="$BUILD/$(exe_name BaboViolentDedicated)"
@@ -123,7 +139,9 @@ if ! bin_exists "$MASTER_BIN" || ! bin_exists "$DED_BIN" || ! bin_exists "$CLI_B
 fi
 bin_exists "$MASTER_BIN" || die "no executable: $MASTER_BIN"
 bin_exists "$DED_BIN" || die "no executable: $DED_BIN"
-bin_exists "$CLI_BIN" || die "no executable: $CLI_BIN"
+if [[ "$need_client" == 1 ]]; then
+	bin_exists "$CLI_BIN" || die "no executable: $CLI_BIN"
+fi
 
 # --- Linux: ldd closure into lib/ ---
 collect_linux_libs() {
@@ -450,7 +468,7 @@ stage_game_content() {
 archive_dir() {
 	local label="$1"
 	local stagedir="$2"
-	local out="$DIST/${label}-${BV2_PLATFORM}-${BV2_ARCH}.${BV2_ARCHIVE}"
+	local out="$DIST/${label}-${BV2_RELEASE_LABEL}-${BV2_ARCH}.${BV2_ARCHIVE}"
 	local payload_root="BaboViolent2"
 	local wrapper
 	rm -f "$out"
@@ -476,9 +494,9 @@ archive_dir() {
 cleanup() { rm -rf "$STAGE"; }
 trap cleanup EXIT
 
-rm -f "$DIST"/BaboViolent-client-"${BV2_PLATFORM}"-"${BV2_ARCH}".* \
-	"$DIST"/BaboViolent-dedicated-"${BV2_PLATFORM}"-"${BV2_ARCH}".* \
-	"$DIST"/BaboMasterServer-"${BV2_PLATFORM}"-"${BV2_ARCH}".* \
+rm -f "$DIST"/BaboViolent-client-"${BV2_RELEASE_LABEL}"-"${BV2_ARCH}".* \
+	"$DIST"/BaboViolent-dedicated-"${BV2_RELEASE_LABEL}"-"${BV2_ARCH}".* \
+	"$DIST"/BaboMasterServer-"${BV2_RELEASE_LABEL}"-"${BV2_ARCH}".* \
 	"$DIST"/BaboMasterServer-linux.zip "$DIST"/BaboViolentDedicated-linux.zip "$DIST"/BaboViolent-linux.zip 2>/dev/null || true
 
 # --- Master ---
@@ -495,9 +513,12 @@ D="$STAGE/dedicated"
 stage_game_content "BaboViolentDedicated" "BaboViolentDedicated" "$DED_BIN" "$D"
 archive_dir "BaboViolent-dedicated" "$D"
 
-# --- Client ---
-C="$STAGE/client"
-stage_game_content "BaboViolent (client)" "BaboViolent" "$CLI_BIN" "$C"
-archive_dir "BaboViolent-client" "$C"
-
-echo "Done. Three archives for ${BV2_PLATFORM}/${BV2_ARCH} are in $DIST/"
+if [[ "$need_client" == 1 ]]; then
+	# --- Client ---
+	C="$STAGE/client"
+	stage_game_content "BaboViolent (client)" "BaboViolent" "$CLI_BIN" "$C"
+	archive_dir "BaboViolent-client" "$C"
+	echo "Done. Three archives for ${BV2_RELEASE_LABEL}/${BV2_ARCH} are in $DIST/"
+else
+	echo "Done. Dedicated + master archives for ${BV2_RELEASE_LABEL}/${BV2_ARCH} are in $DIST/"
+fi
