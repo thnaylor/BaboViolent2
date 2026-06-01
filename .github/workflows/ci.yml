@@ -27,6 +27,9 @@ jobs:
             image: fedora:43
     container:
       image: ${{ matrix.image }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Install git for checkout
         run: |
