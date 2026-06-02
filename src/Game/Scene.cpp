@@ -181,14 +181,7 @@ void Scene::update(float delay)
 #ifndef DEDICATED_SERVER
 	if (mainTab)
 	{
-		if (master->isConnected())
-		{
-			mainTab->browser->btn_refresh->enable = false;
-		}
-		else
-		{
-			mainTab->browser->btn_refresh->enable = true;
-		}
+		mainTab->browser->btn_refresh->enable = true;
 	}
 	if (introScreen)
 	{

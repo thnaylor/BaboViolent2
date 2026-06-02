@@ -416,11 +416,9 @@ int cMasterServer::GetBV2List(MasterClient *client)
 
 	if(!client) return 0;
 
-	if(client->nbGames > 0) 
-	{
-		printf("Player %i is already querying master\n",client->BabonetID);
-		return 0;
-	}
+	// Reset any in-progress queue (refresh on the same TCP session).
+	client->nbGames = 0;
+	client->CurrentGame = 0;
 
 	//on va sneder les info du master au player
 	stMasterInfo info;
@@ -428,24 +426,18 @@ int cMasterServer::GetBV2List(MasterClient *client)
 	
 	bb_serverSend((char*)&info,sizeof(stMasterInfo),MASTER_INFO,client->BabonetID);
 	
-	//y a til des enregistrement retourne ?
+	// Send every BV2_ROW immediately so a fast client refresh/disconnect cannot
+	// miss rows that were previously dripped one-per-tick in MasterClient::Update.
 	if(NbGames)
 	{
-		client->nbGames = NbGames;
-		client->CurrentGame = 0;
-
 		int i=0;
-		//on va copier les game a notre client
 		for(cBV2game *G=Games;G;G=G->Next)
 		{
-			memcpy(&(client->CurrentGames[i]),&(G->GameInfos),sizeof(stBV2row));
-
+			bb_serverSend((char*)&(G->GameInfos), sizeof(stBV2row), BV2_ROW, client->BabonetID);
 			i++;
-			if(i>=100) return 0;
+			if(i>=100) break;
 		}
 	}
-	
-	
 
 	return 0;
 }

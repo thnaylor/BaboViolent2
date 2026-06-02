@@ -130,10 +130,8 @@ void CMaster::pingReceived(int ping)
 		//--- Remove that row
 		m_games.erase(m_games.begin());
 
-		if( m_games.size() == 0 )
-		{
-			disconnectMaster();
-		}
+		// Keep the master TCP session open for browser refresh (do not disconnect
+		// after each listing — that caused connect/disconnect storms on refresh spam).
 	}
 }
 
@@ -265,7 +263,13 @@ void CMaster::update(float in_delay)
 		stBV2row * bv2Row = m_games[0];
 
 		m_ping = new CPing();
-		m_ping->ping(CString("%s", bv2Row->ip), bv2Row->port);
+		if (m_ping->ping(CString("%s", bv2Row->ip), bv2Row->port) == -1)
+		{
+			// Can't reach host for UDP ping (empty IP, etc.) — still list the game.
+			delete m_ping;
+			m_ping = 0;
+			pingReceived(1000);
+		}
 	}
 
 	// peer timeouts
@@ -731,7 +735,6 @@ void CMaster::recvPacket(const char * buffer, int typeID)
 			if (masterInfo.NbGames == 0)
 			{
 				m_nbGameFound = 0;
-				disconnectMaster();
 				console->add(CString("\x3> No games found"));
 			}
 			else if (masterInfo.NbGames == -1)
@@ -917,9 +920,9 @@ void CMaster::requestGames()
 		if( lobby ) lobby->clearLobby();
 	#endif
 
-	//clear the game stack
-	int i;
-	ZEVEN_DELETE_VECTOR(m_games, i);
+	ZEVEN_SAFE_DELETE(m_ping);
+	eraseGames();
+	m_nbGameFound = 0;
 
 	stBV2list bv2List;
 	strcpy(bv2List.Version, m_CurrentVersion );

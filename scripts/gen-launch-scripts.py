@@ -154,9 +154,9 @@ set sv_serverType 0
         "map_comment": "//--- Full team-map rotation (CTF layouts, TDM rules) ---//",
     },
     {
-        "file": "Sandbox.cfg",
+        "file": "Champion.cfg",
         "header": """/////////////////////////////////
-//--- babo.soh.re Sandbox server ---//
+//--- babo.soh.re Champion server ---//
 /////////////////////////////////
 // sv_gameType 3 = Champion. Port 3336.
 """,
@@ -173,7 +173,7 @@ set sv_scoreLimit 50
 set sv_winLimit 7
 set sv_gameType 3
 set sv_bombTime 60
-set sv_gameName "^6babo.soh.re ^8Sandbox"
+set sv_gameName "^6babo.soh.re ^8Champion"
 set sv_port 3336
 set sv_maxPlayer 16
 set sv_password ""
@@ -187,7 +187,7 @@ set sv_serverType 0
 """
         + COMMON_WEAPONS,
         "maps": maps_with_prefix("CHP-", "KOTH-"),
-        "map_comment": "//--- CHP + KOTH sandbox / Champion rotation ---//",
+        "map_comment": "//--- CHP + KOTH Champion rotation ---//",
     },
 ]
 
