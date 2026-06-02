@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/Jmainguy/BaboViolent2/compare/v3.1.0...v3.1.1) (2026-06-02)
+
+
+### Bug Fixes
+
+* **master:** reliable browser refresh and distro-native server builds ([ac302e9](https://github.com/Jmainguy/BaboViolent2/commit/ac302e90d744e105e43e4fea4d59f0c84aeae48d))
+
 ## [3.1.0](https://github.com/Jmainguy/BaboViolent2/compare/v3.0.1...v3.1.0) (2026-06-01)
 
 
