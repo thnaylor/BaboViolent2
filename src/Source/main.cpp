@@ -18,10 +18,13 @@
 
 #ifdef WIN32
 #define _WIN32_WINNT 0x0400
+#include <windows.h>
 #endif
 
 #ifndef WIN32
 	#include "LinuxHeader.h"
+	#include <sys/stat.h>
+	#include <unistd.h>
 #endif
 
 #include "Zeven.h"
@@ -48,6 +51,50 @@
 	#endif
 #endif
 
+
+// Find Content/ relative to the executable and chdir into it when we are not
+// already positioned there.  This lets users double-click the .exe from a flat
+// layout (exe + DLLs + Content/ all in the same folder) without needing a
+// wrapper .bat or .sh to set the working directory first.
+static void bv2_relocate_to_content()
+{
+#ifdef WIN32
+    // Already in the right place?
+    if (GetFileAttributesA("main\\bv2.cfg") != INVALID_FILE_ATTRIBUTES)
+        return;
+
+    char exeDir[MAX_PATH];
+    if (!GetModuleFileNameA(NULL, exeDir, MAX_PATH))
+        return;
+    char *sep = strrchr(exeDir, '\\');
+    if (sep) *sep = '\0';
+
+    char content[MAX_PATH];
+    snprintf(content, MAX_PATH, "%s\\Content", exeDir);
+    DWORD attr = GetFileAttributesA(content);
+    if (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY))
+        SetCurrentDirectoryA(content);
+#else
+    // Already in the right place?  (run.sh already cds here, so this is a
+    // no-op for the normal script-launched case.)
+    struct stat st;
+    if (stat("main/bv2.cfg", &st) == 0)
+        return;
+
+    char exePath[4096];
+    ssize_t len = readlink("/proc/self/exe", exePath, sizeof(exePath) - 1);
+    if (len <= 0)
+        return;
+    exePath[len] = '\0';
+    char *sep = strrchr(exePath, '/');
+    if (sep) *sep = '\0';
+
+    char content[4096];
+    snprintf(content, sizeof(content), "%s/Content", exePath);
+    if (stat(content, &st) == 0 && S_ISDIR(st.st_mode))
+        chdir(content);
+#endif
+}
 
 // notre scene
 Scene * scene = 0;
@@ -352,10 +399,15 @@ public:
 			// On va updater notre timer
 			int nbFrameElapsed = dkcUpdateTimer();
 
+			// Cap catch-up: if the scheduler delayed us (common in containers/VMs),
+			// dkcUpdateTimer returns a huge burst count.  Processing hundreds of
+			// frames in one shot floods the TCP send buffer and blocks send() forever.
+			if (nbFrameElapsed > 4) nbFrameElapsed = 4;
+
 			// On va chercher notre delay
 			float delay = dkcGetElapsedf();
 
-			// On passe le nombre de frame �animer
+			// On passe le nombre de frame�animer
 			while (nbFrameElapsed)
 			{
 				// Update la console
@@ -469,6 +521,8 @@ int main(int argc, const char* argv[])
 {
 
 	// lil print out so that people now know that its working
+
+	bv2_relocate_to_content();
 
 	printf("***************************************\n");
 	printf("*   Babo Violent 2 Dedicated Server   *\n");
@@ -637,23 +691,24 @@ int main(int argc, const char* argv[])
 	{
 		std::cin.getline(input,256);
 
-
-		mainLoopConsole.lock();
 		if(std::cin.gcount())
-			console->sendCommand(input);//CString("Execute CTF"));
-		mainLoopConsole.unlock();
-
+		{
+			mainLoopConsole.lock();
+			console->sendCommand(input);
+			mainLoopConsole.unlock();
+		}
 
 		#ifdef WIN32
-			Sleep(1);
-
+			Sleep(std::cin.fail() ? 100 : 1);
 		#else
-			if(nanosleep(&ts,0))
-			{
-				printf("problem nanosleep console loop\n");
-			}
-			ts.tv_sec = 0;
-			ts.tv_nsec = 1000000;
+		{
+			// Sleep longer when stdin is exhausted (Docker/headless) so we don't
+			// spin at 1000 Hz and starve the game-loop thread via constant locking.
+			struct timespec sleep_ts;
+			sleep_ts.tv_sec  = 0;
+			sleep_ts.tv_nsec = std::cin.fail() ? 100000000L : 1000000L; // 100ms or 1ms
+			nanosleep(&sleep_ts, 0);
+		}
 		#endif
 
 		//cin.ignore( 10000 , '\n');
@@ -702,6 +757,8 @@ int main(int argc, const char* argv[])
 //
 static int RunGraphicalClient(const char* cmdLine)
 {
+	bv2_relocate_to_content();
+
 	// PREMI�E CHOSE �FAIRE, on load les config
 	dksvarInit(&stringInterface);
 	dksvarLoadConfig("main/bv2.cfg");
@@ -855,7 +912,6 @@ static int RunGraphicalClient(const char* cmdLine)
 	{
 		console->sendCommand( str );
 	}
-
 
 	// La loop principal
 /*	try

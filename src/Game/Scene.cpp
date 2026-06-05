@@ -129,10 +129,10 @@ Scene::Scene()
 	sprintf(SQL,"Select Value From LauncherSettings where Name = 'DidSurvey';");
 	sqlite3_get_table(DB,SQL,&azResult,&nRow,&nColumn,&zErrMsg);
 
-	int didSurvey = atoi(azResult[1]);
+	int didSurvey = (azResult && nRow > 0) ? atoi(azResult[1]) : 0;
 	sqlite3_free_table(azResult);
 	sqlite3_close( DB );
-	
+
 	surveySent = (didSurvey == 0 ? false : true);
 
 #endif

@@ -113,7 +113,7 @@ Server::~Server()
 
 	stKillServ killServ;
 	killServ.Port = gameVar.sv_port;
-	if (master) master->sendPacket((char*)(&killServ), sizeof(stKillServ), KILL_SERV);
+	if (master && gameVar.sv_gamePublic) master->sendPacket((char*)(&killServ), sizeof(stKillServ), KILL_SERV);
 }
 
 

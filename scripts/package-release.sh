@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build three self-contained release archives (client, dedicated, master).
+# Package BaboViolent 2 release archives.
 #
 # Usage (from repo root):
 #   BV2_PLATFORM=linux|macos|windows ./scripts/package-release.sh
@@ -12,10 +12,10 @@
 #   BV2_SERVER_ONLY=1               (package dedicated + master only; skip client)
 #
 # Output (examples):
-#   dist/BaboViolent-client-linux-x86_64.tar.gz
-#   dist/BaboViolent-dedicated-linux-x86_64.tar.gz
+#   dist/BaboViolent2-windows-x86_64.zip          (game + server, flat layout)
+#   dist/BaboViolent2-linux-x86_64.tar.gz         (game + server)
 #   dist/BaboMasterServer-linux-x86_64.tar.gz
-#   dist/BaboViolent-dedicated-debian-12-bookworm-x86_64.tar.gz
+#   dist/BaboViolent2-server-debian-12-bookworm-x86_64.tar.gz
 #   dist/BaboMasterServer-fedora-44-x86_64.tar.gz
 
 set -euo pipefail
@@ -277,30 +277,65 @@ EOF
 }
 
 write_readme_game() {
-	local name="$1"
-	local d="$2"
-	cat >"$d/README.txt" <<EOF
-$name (${BV2_PLATFORM} ${BV2_ARCH})
--------------------
-Unpack anywhere. From this directory run:
+	local d="$1"
+	local server_only="${2:-0}"
+	if [[ "$BV2_PLATFORM" == windows ]]; then
+		if [[ "$server_only" == 1 ]]; then
+			cat >"$d/README.txt" <<EOF
+BaboViolent 2 Dedicated Server (${BV2_PLATFORM} ${BV2_ARCH})
+-------------------------------------------------------------
+Double-click BaboViolentDedicated.exe to start an FFA server.
+Pass a game mode as the first argument for a different mode:
+  BaboViolentDedicated.exe CTF
+  BaboViolentDedicated.exe TDM
 
-  $( [[ "$BV2_PLATFORM" == windows ]] && echo run.bat [args...] || echo ./run.sh [args...] )
+Game content is in the Content/ folder next to the .exe.
+EOF
+		else
+			cat >"$d/README.txt" <<EOF
+BaboViolent 2 (${BV2_PLATFORM} ${BV2_ARCH})
+--------------------------------------------
+PLAY:   Double-click BaboViolent.exe
+HOST:   Double-click BaboViolentDedicated.exe  (starts FFA by default)
+        Or run from a command prompt:
+          BaboViolentDedicated.exe CTF
+          BaboViolentDedicated.exe TDM
 
-Examples:
-  $( [[ "$BV2_PLATFORM" == windows ]] && echo run.bat FFA || echo ./run.sh FFA )
-  $( [[ "$BV2_PLATFORM" == windows ]] && echo run.bat CTF || echo ./run.sh CTF )
-  $( [[ "$BV2_PLATFORM" == windows ]] && echo run.bat || echo ./run.sh )
-
-The working directory for the game is ./Content (maps, cfg, sounds, etc.).
+Game content is in the Content/ folder next to the .exe files.
 
 This package includes a default Content/bv2.db with:
   - Master host babo.soh.re
-  - Port column 11207 (maps to TCP 10207 in-game)
   - Launcher profile default name "Unamed Babo"
 
-To use a local master, edit Content/bv2.db MasterServers to your host; Port
-column = TCP listen + 1000 (11207 for 10207).
+To use a local master, edit Content/bv2.db MasterServers to your host.
 EOF
+		fi
+	else
+		if [[ "$server_only" == 1 ]]; then
+			cat >"$d/README.txt" <<EOF
+BaboViolent 2 Dedicated Server (${BV2_RELEASE_LABEL} ${BV2_ARCH})
+------------------------------------------------------------------
+Unpack anywhere, then:
+  ./server.sh [FFA|CTF|TDM|...]   (default: FFA)
+
+This package includes a default Content/bv2.db pointing at babo.soh.re.
+EOF
+		else
+			cat >"$d/README.txt" <<EOF
+BaboViolent 2 (${BV2_RELEASE_LABEL} ${BV2_ARCH})
+-------------------------------------------------
+Unpack anywhere, then:
+  ./play.sh                        (launch game client)
+  ./server.sh [FFA|CTF|TDM|...]   (launch dedicated server; default: FFA)
+
+This package includes a default Content/bv2.db with:
+  - Master host babo.soh.re
+  - Launcher profile default name "Unamed Babo"
+
+To use a local master, edit Content/bv2.db MasterServers to your host.
+EOF
+		fi
+	fi
 }
 
 write_default_game_bv2_db() {
@@ -369,35 +404,23 @@ set "PATH=%~dp0lib;%PATH%"
 EOF
 }
 
-write_run_game_unix() {
-	local exe="$1"
-	local d="$2"
-	cat >"$d/run.sh" <<EOF
+write_run_unix() {
+	local script="$1"   # output filename, e.g. play.sh or server.sh
+	local exe="$2"      # binary name inside bin/
+	local d="$3"
+	local default_arg="${4:-}"
+	cat >"$d/$script" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 DIR="\$(cd "\$(dirname "\$0")" && pwd)"
-# Prefer system runtime libs for compatibility. Only fall back to bundled libs
-# when ldd reports missing dependencies, or when explicitly requested.
 if [[ "\${BV2_FORCE_BUNDLED_LIBS:-0}" == "1" ]] || ldd "\$DIR/bin/$exe" 2>/dev/null | grep -q "not found"; then
 	export LD_LIBRARY_PATH="\$DIR/lib\${LD_LIBRARY_PATH:+:\$LD_LIBRARY_PATH}"
 	export DYLD_LIBRARY_PATH="\$DIR/lib\${DYLD_LIBRARY_PATH:+:\$DYLD_LIBRARY_PATH}"
 fi
-cd "\$DIR/Content" || { echo "missing Content/ next to run.sh" >&2; exit 1; }
-exec "\$DIR/bin/$exe" "\$@"
+cd "\$DIR/Content" || { echo "missing Content/ next to $script" >&2; exit 1; }
+exec "\$DIR/bin/$exe" \${@:-$default_arg}
 EOF
-	chmod +x "$d/run.sh"
-}
-
-write_run_game_windows() {
-	local exe="$1"
-	local d="$2"
-	cat >"$d/run.bat" <<EOF
-@echo off
-setlocal
-set "PATH=%~dp0lib;%PATH%"
-cd /d "%~dp0Content"
-"%~dp0bin\\${exe}.exe" %*
-EOF
+	chmod +x "$d/$script"
 }
 
 write_bootstrap_unix() {
@@ -445,24 +468,47 @@ stage_master_content() {
 	write_readme_master "$d"
 }
 
-stage_game_content() {
-	local name="$1"
-	local exe="$2"
-	local src_bin="$3"
-	local d="$4"
-	mkdir -p "$d/bin" "$d/lib"
-	cp -a "$src_bin" "$d/bin/$exe"
-	chmod +x "$d/bin/$exe" 2>/dev/null || true
-	collect_libs "$d/lib" "$d/bin/$exe"
+# Stage a combined game + server package.
+#
+# Windows: flat layout — exes and DLLs sit alongside Content/ so users can
+#   double-click the .exe without any wrapper script or SmartScreen-triggering .bat.
+#   The exe itself calls bv2_relocate_to_content() at startup.
+#
+# Linux/macOS: bin/ + lib/ layout with play.sh and server.sh launcher scripts.
+#
+# server_only=1 omits the game client and produces server.sh only.
+stage_combined_game() {
+	local d="$1"
+	local server_only="${2:-0}"
+
 	cp -a "$ROOT/Content" "$d/Content"
 	write_default_game_bv2_db "$d/Content"
 	set_default_player_name_cfg "$d/Content"
+
 	if [[ "$BV2_PLATFORM" == windows ]]; then
-		write_run_game_windows "$exe" "$d"
+		# Flat layout: exe(s) and DLLs at the same level as Content/.
+		# No wrapper .bat — the exe finds Content/ on its own.
+		cp -a "$DED_BIN" "$d/$(exe_name BaboViolentDedicated)"
+		collect_libs "$d" "$d/$(exe_name BaboViolentDedicated)"
+		if [[ "$server_only" != 1 ]] && bin_exists "$CLI_BIN"; then
+			cp -a "$CLI_BIN" "$d/$(exe_name BaboViolent)"
+			collect_libs "$d" "$d/$(exe_name BaboViolent)"
+		fi
 	else
-		write_run_game_unix "$exe" "$d"
+		mkdir -p "$d/bin" "$d/lib"
+		cp -a "$DED_BIN" "$d/bin/BaboViolentDedicated"
+		chmod +x "$d/bin/BaboViolentDedicated"
+		collect_libs "$d/lib" "$d/bin/BaboViolentDedicated"
+		write_run_unix "server.sh" "BaboViolentDedicated" "$d" "FFA"
+		if [[ "$server_only" != 1 ]] && bin_exists "$CLI_BIN"; then
+			cp -a "$CLI_BIN" "$d/bin/BaboViolent"
+			chmod +x "$d/bin/BaboViolent"
+			collect_libs "$d/lib" "$d/bin/BaboViolent"
+			write_run_unix "play.sh" "BaboViolent" "$d"
+		fi
 	fi
-	write_readme_game "$name" "$d"
+
+	write_readme_game "$d" "$server_only"
 }
 
 archive_dir() {
@@ -494,10 +540,14 @@ archive_dir() {
 cleanup() { rm -rf "$STAGE"; }
 trap cleanup EXIT
 
-rm -f "$DIST"/BaboViolent-client-"${BV2_RELEASE_LABEL}"-"${BV2_ARCH}".* \
-	"$DIST"/BaboViolent-dedicated-"${BV2_RELEASE_LABEL}"-"${BV2_ARCH}".* \
+rm -f \
+	"$DIST"/BaboViolent2-"${BV2_RELEASE_LABEL}"-"${BV2_ARCH}".* \
+	"$DIST"/BaboViolent2-server-"${BV2_RELEASE_LABEL}"-"${BV2_ARCH}".* \
 	"$DIST"/BaboMasterServer-"${BV2_RELEASE_LABEL}"-"${BV2_ARCH}".* \
-	"$DIST"/BaboMasterServer-linux.zip "$DIST"/BaboViolentDedicated-linux.zip "$DIST"/BaboViolent-linux.zip 2>/dev/null || true
+	"$DIST"/BaboMasterServer-linux.zip "$DIST"/BaboViolentDedicated-linux.zip "$DIST"/BaboViolent-linux.zip \
+	"$DIST"/BaboViolent-client-"${BV2_RELEASE_LABEL}"-"${BV2_ARCH}".* \
+	"$DIST"/BaboViolent-dedicated-"${BV2_RELEASE_LABEL}"-"${BV2_ARCH}".* \
+	2>/dev/null || true
 
 # --- Master ---
 M="$STAGE/master"
@@ -508,17 +558,15 @@ collect_libs "$M/lib" "$M/bin/$(exe_name BaboMasterServer)"
 stage_master_content "$M"
 archive_dir "BaboMasterServer" "$M"
 
-# --- Dedicated ---
-D="$STAGE/dedicated"
-stage_game_content "BaboViolentDedicated" "BaboViolentDedicated" "$DED_BIN" "$D"
-archive_dir "BaboViolent-dedicated" "$D"
-
+# --- Game + server (combined) ---
+G="$STAGE/game"
+mkdir -p "$G"
 if [[ "$need_client" == 1 ]]; then
-	# --- Client ---
-	C="$STAGE/client"
-	stage_game_content "BaboViolent (client)" "BaboViolent" "$CLI_BIN" "$C"
-	archive_dir "BaboViolent-client" "$C"
-	echo "Done. Three archives for ${BV2_RELEASE_LABEL}/${BV2_ARCH} are in $DIST/"
+	stage_combined_game "$G" 0
+	archive_dir "BaboViolent2" "$G"
+	echo "Done. BaboViolent2 + BaboMasterServer archives for ${BV2_RELEASE_LABEL}/${BV2_ARCH} are in $DIST/"
 else
-	echo "Done. Dedicated + master archives for ${BV2_RELEASE_LABEL}/${BV2_ARCH} are in $DIST/"
+	stage_combined_game "$G" 1
+	archive_dir "BaboViolent2-server" "$G"
+	echo "Done. BaboViolent2-server + BaboMasterServer archives for ${BV2_RELEASE_LABEL}/${BV2_ARCH} are in $DIST/"
 fi

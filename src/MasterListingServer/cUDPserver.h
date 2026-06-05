@@ -2,7 +2,7 @@
 #define _UDP_SERVER_H
 
 #include "cServer.h"
-#include "cClient.h"
+#include "CClient.h"
 #include "cPeer2Peer.h"
 
 class cUDPserver
