@@ -39,17 +39,24 @@ $Stage   = Join-Path $Root (Join-Path $OutDir $PkgName)
 if (Test-Path $Stage) { Remove-Item $Stage -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $Stage | Out-Null
 
-Write-Host "Copying Content/..."
-Copy-Item -Path (Join-Path $Root "Content") -Destination (Join-Path $Stage "Content") -Recurse
-
-# Exes and DLLs go inside Content/ so main\bv2.cfg is found immediately —
-# no relocation logic needed.
-$ContentStage = Join-Path $Stage "Content"
+# Copy game data flat — main\ sits next to the exe so main\bv2.cfg is found
+# immediately on launch; no Content\ wrapper needed.
+# Use git ls-files so only committed files are included (no dev artifacts).
+Write-Host "Copying game data..."
+$tracked = & git -C $Root ls-files "Content/" 2>$null
+foreach ($rel in $tracked) {
+    $src = Join-Path $Root $rel
+    # Strip the leading Content/ prefix for the destination
+    $dst = Join-Path $Stage ($rel -replace '^Content[\\/]', '')
+    $dstDir = Split-Path $dst -Parent
+    if (-not (Test-Path $dstDir)) { New-Item -ItemType Directory -Force -Path $dstDir | Out-Null }
+    Copy-Item -Path $src -Destination $dst
+}
 
 Write-Host "Copying executables..."
-Copy-Item -Path $ServerExe -Destination (Join-Path $ContentStage "BaboViolentDedicated.exe")
+Copy-Item -Path $ServerExe -Destination (Join-Path $Stage "BaboViolentDedicated.exe")
 if (Test-Path $ClientExe) {
-    Copy-Item -Path $ClientExe -Destination (Join-Path $ContentStage "BaboViolent.exe")
+    Copy-Item -Path $ClientExe -Destination (Join-Path $Stage "BaboViolent.exe")
 } else {
     Write-Warning "Client exe not found - server-only package"
 }
@@ -79,7 +86,7 @@ if ($CrtDir) {
     foreach ($dll in $DllsToCopy) {
         $src = Join-Path $CrtDir $dll
         if (Test-Path $src) {
-            Copy-Item -Path $src -Destination (Join-Path $ContentStage $dll)
+            Copy-Item -Path $src -Destination (Join-Path $Stage $dll)
             Write-Host "  $dll"
         }
     }
@@ -90,11 +97,11 @@ if ($CrtDir) {
 $readme = @(
     "BaboViolent 2 (Windows x86_64)"
     "-------------------------------"
-    "PLAY:   Double-click Content\BaboViolent.exe"
-    "HOST:   Double-click Content\BaboViolentDedicated.exe  (starts FFA by default)"
+    "PLAY:   Double-click BaboViolent.exe"
+    "HOST:   Double-click BaboViolentDedicated.exe  (starts FFA by default)"
     "        Or from a command prompt:"
-    "          Content\BaboViolentDedicated.exe CTF"
-    "          Content\BaboViolentDedicated.exe TDM"
+    "          BaboViolentDedicated.exe CTF"
+    "          BaboViolentDedicated.exe TDM"
 )
 $readme | Out-File -FilePath (Join-Path $Stage "README.txt") -Encoding utf8
 
