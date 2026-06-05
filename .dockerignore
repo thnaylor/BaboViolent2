@@ -1,0 +1,8 @@
+build/
+build-linux/*.map
+.git/
+src/
+thirdparty/
+scripts/
+cmake/
+.github/
