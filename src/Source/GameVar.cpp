@@ -647,8 +647,8 @@ GameVar::GameVar()
 	r_fullScreen = true;
 #endif
 	dksvarRegister(CString("r_fullScreen [bool : true | false (default true)]"), &r_fullScreen, true);
-	r_resolution.set(800,600);
-	dksvarRegister(CString("r_resolution [vector2i : (default 800 600)]"), &r_resolution, true);
+	r_resolution.set(0,0);
+	dksvarRegister(CString("r_resolution [vector2i : (default 0 0 = auto-detect)]"), &r_resolution, true);
 	r_bitdepth = 32;
 	dksvarRegister(CString("r_bitdepth [int : 16 | 32 (default 32)]"), &r_bitdepth, 16, 32,
 		LIMIT_MIN | LIMIT_MAX, true);

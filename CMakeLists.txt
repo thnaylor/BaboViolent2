@@ -138,6 +138,7 @@ endif()
 
 if(WIN32 OR APPLE OR NOT BV2_LINUX_SYS_SDL2)
 	set(HAVE_LIBC ON)
+	set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 	add_subdirectory(./thirdparty/SDL/)
 	list(APPEND libs SDL2-static)
 	list(APPEND includes PUBLIC ./thirdparty/SDL/include/)

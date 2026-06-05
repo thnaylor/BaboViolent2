@@ -157,8 +157,19 @@ int dkwInit(int width, int height, int mcolorDepth, char* mTitle, CMainLoopInter
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_DisplayMode current;
     SDL_GetCurrentDisplayMode(0, &current);
-    Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
-    if (fullScreen) flags |= SDL_WINDOW_FULLSCREEN;
+    bool autoDetect = (width == 0 || height == 0);
+    if (autoDetect)
+    {
+        width = current.w;
+        height = current.h;
+    }
+    Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
+    if (fullScreen)
+    {
+        // FULLSCREEN_DESKTOP avoids a display-mode change and scales nothing;
+        // use it when auto-detecting so the window exactly matches the desktop.
+        flags |= autoDetect ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_FULLSCREEN;
+    }
     window = SDL_CreateWindow(mTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
     gl_context = SDL_GL_CreateContext(window);
     SDL_GL_SetSwapInterval(1); // Enable vsync
@@ -226,7 +237,7 @@ CVector2i dkwGetResolution()
 {
     SDL_Window* pWindow = SDL_GL_GetCurrentWindow();
     int w, h;
-    SDL_GetWindowSize(pWindow, &w, &h);
+    SDL_GL_GetDrawableSize(pWindow, &w, &h);
 
     return { w, h };
 }

@@ -102,37 +102,57 @@ COption::COption(CControl * in_parent, CControl * in_alignTo)
 		if (gameVar.r_widescreen == 2) lst_viewMode->selectChild(2);
 
 		//--- Screen resolution
-		label1 = new CControl(instance, CVector2i(20,10), CVector2i(200,150),"Screen resolution:", this, "LABEL", label1, CONTROL_SNAP_BOTTOM);
+		label1 = new CControl(instance, CVector2i(20,10), CVector2i(200,220),"Screen resolution:", this, "LABEL", label1, CONTROL_SNAP_BOTTOM);
 		label1->textAlign = CONTROL_TEXTALIGN_MIDDLERIGHT;
 		label1->toolTips = "(Need to reboot the game).";
 
 		if(gameVar.r_widescreen)
 		{
-			lst_resolution = new CControl(instance, CVector2i(10,10), CVector2i(300,150),"", this, "LISTBOX", label1, CONTROL_SNAP_RIGHT);
-			CControl * item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"960 x 600", this, "LABEL");
-			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1280 x 800", this, "LABEL", item, CONTROL_SNAP_BOTTOM);
-			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1440 x 900", this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			lst_resolution = new CControl(instance, CVector2i(10,10), CVector2i(300,220),"", this, "LISTBOX", label1, CONTROL_SNAP_RIGHT);
+			CControl * item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"Auto (detect)", this, "LABEL");
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"960 x 600",   this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1280 x 720",  this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1280 x 800",  this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1440 x 900",  this, "LABEL", item, CONTROL_SNAP_BOTTOM);
 			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1680 x 1050", this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1920 x 1080", this, "LABEL", item, CONTROL_SNAP_BOTTOM);
 			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1920 x 1200", this, "LABEL", item, CONTROL_SNAP_BOTTOM);
-			if (gameVar.r_resolution == CVector2i(960, 600)) lst_resolution->selectChild(0);
-			if (gameVar.r_resolution == CVector2i(1280, 800)) lst_resolution->selectChild(1);
-			if (gameVar.r_resolution == CVector2i(1440, 900)) lst_resolution->selectChild(2);
-			if (gameVar.r_resolution == CVector2i(1680, 1050)) lst_resolution->selectChild(3);
-			if (gameVar.r_resolution == CVector2i(1920, 1200)) lst_resolution->selectChild(4);
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"2560 x 1440", this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"3840 x 2160", this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			if (gameVar.r_resolution == CVector2i(0, 0))      lst_resolution->selectChild(0);
+			if (gameVar.r_resolution == CVector2i(960, 600))   lst_resolution->selectChild(1);
+			if (gameVar.r_resolution == CVector2i(1280, 720))  lst_resolution->selectChild(2);
+			if (gameVar.r_resolution == CVector2i(1280, 800))  lst_resolution->selectChild(3);
+			if (gameVar.r_resolution == CVector2i(1440, 900))  lst_resolution->selectChild(4);
+			if (gameVar.r_resolution == CVector2i(1680, 1050)) lst_resolution->selectChild(5);
+			if (gameVar.r_resolution == CVector2i(1920, 1080)) lst_resolution->selectChild(6);
+			if (gameVar.r_resolution == CVector2i(1920, 1200)) lst_resolution->selectChild(7);
+			if (gameVar.r_resolution == CVector2i(2560, 1440)) lst_resolution->selectChild(8);
+			if (gameVar.r_resolution == CVector2i(3840, 2160)) lst_resolution->selectChild(9);
 		}
 		else
 		{
-			lst_resolution = new CControl(instance, CVector2i(10,10), CVector2i(300,150),"", this, "LISTBOX", label1, CONTROL_SNAP_RIGHT);
-			CControl * item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"640 x 480", this, "LABEL");
-			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"800 x 600", this, "LABEL", item, CONTROL_SNAP_BOTTOM);
-			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1024 x 768", this, "LABEL", item, CONTROL_SNAP_BOTTOM);
-			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1280 x 960", this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			lst_resolution = new CControl(instance, CVector2i(10,10), CVector2i(300,220),"", this, "LISTBOX", label1, CONTROL_SNAP_RIGHT);
+			CControl * item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"Auto (detect)", this, "LABEL");
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"640 x 480",   this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"800 x 600",   this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1024 x 768",  this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1152 x 864",  this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1280 x 960",  this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1280 x 1024", this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1400 x 1050", this, "LABEL", item, CONTROL_SNAP_BOTTOM);
 			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1600 x 1200", this, "LABEL", item, CONTROL_SNAP_BOTTOM);
-			if (gameVar.r_resolution == CVector2i(640, 480)) lst_resolution->selectChild(0);
-			if (gameVar.r_resolution == CVector2i(800, 600)) lst_resolution->selectChild(1);
-			if (gameVar.r_resolution == CVector2i(1024, 768)) lst_resolution->selectChild(2);
-			if (gameVar.r_resolution == CVector2i(1280, 960)) lst_resolution->selectChild(3);
-			if (gameVar.r_resolution == CVector2i(1600, 1200)) lst_resolution->selectChild(4);
+			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"2048 x 1536", this, "LABEL", item, CONTROL_SNAP_BOTTOM);
+			if (gameVar.r_resolution == CVector2i(0, 0))      lst_resolution->selectChild(0);
+			if (gameVar.r_resolution == CVector2i(640, 480))   lst_resolution->selectChild(1);
+			if (gameVar.r_resolution == CVector2i(800, 600))   lst_resolution->selectChild(2);
+			if (gameVar.r_resolution == CVector2i(1024, 768))  lst_resolution->selectChild(3);
+			if (gameVar.r_resolution == CVector2i(1152, 864))  lst_resolution->selectChild(4);
+			if (gameVar.r_resolution == CVector2i(1280, 960))  lst_resolution->selectChild(5);
+			if (gameVar.r_resolution == CVector2i(1280, 1024)) lst_resolution->selectChild(6);
+			if (gameVar.r_resolution == CVector2i(1400, 1050)) lst_resolution->selectChild(7);
+			if (gameVar.r_resolution == CVector2i(1600, 1200)) lst_resolution->selectChild(8);
+			if (gameVar.r_resolution == CVector2i(2048, 1536)) lst_resolution->selectChild(9);
 		}
 		
 
@@ -667,19 +687,27 @@ void COption::Click(CControl * control)
 		{
 			if(lst_viewMode->selectedIndex > 0)
 			{
-				lst_resolution->children[2]->text = "960 x 600";
-				lst_resolution->children[3]->text = "1280 x 800";
-				lst_resolution->children[4]->text = "1440 x 900";
-				lst_resolution->children[5]->text = "1680 x 1050";
-				lst_resolution->children[6]->text = "1920 x 1200";		
+				lst_resolution->children[3]->text = "960 x 600";
+				lst_resolution->children[4]->text = "1280 x 720";
+				lst_resolution->children[5]->text = "1280 x 800";
+				lst_resolution->children[6]->text = "1440 x 900";
+				lst_resolution->children[7]->text = "1680 x 1050";
+				lst_resolution->children[8]->text = "1920 x 1080";
+				lst_resolution->children[9]->text = "1920 x 1200";
+				lst_resolution->children[10]->text = "2560 x 1440";
+				lst_resolution->children[11]->text = "3840 x 2160";
 			}
 			else
 			{
-				lst_resolution->children[2]->text = "640 x 480";
-				lst_resolution->children[3]->text = "800 x 600";
-				lst_resolution->children[4]->text = "1024 x 768";
-				lst_resolution->children[5]->text = "1280 x 960";
-				lst_resolution->children[6]->text = "1600 x 1200";
+				lst_resolution->children[3]->text = "640 x 480";
+				lst_resolution->children[4]->text = "800 x 600";
+				lst_resolution->children[5]->text = "1024 x 768";
+				lst_resolution->children[6]->text = "1152 x 864";
+				lst_resolution->children[7]->text = "1280 x 960";
+				lst_resolution->children[8]->text = "1280 x 1024";
+				lst_resolution->children[9]->text = "1400 x 1050";
+				lst_resolution->children[10]->text = "1600 x 1200";
+				lst_resolution->children[11]->text = "2048 x 1536";
 			}
 		}
 		gameVar.r_widescreen = lst_viewMode->selectedIndex;
@@ -688,24 +716,34 @@ void COption::Click(CControl * control)
 		{
 			switch (lst_resolution->selectedIndex)
 			{
-			case 0: gameVar.r_resolution.set(960, 600); break;
-			case 1: gameVar.r_resolution.set(1280, 800); break;
-			case 2: gameVar.r_resolution.set(1440, 900); break;
-			case 3: gameVar.r_resolution.set(1680, 1050); break;
-			case 4: gameVar.r_resolution.set(1920, 1200); break;
-			default: gameVar.r_resolution.set(1280, 800); break;
+			case 0: gameVar.r_resolution.set(0, 0); break;
+			case 1: gameVar.r_resolution.set(960, 600); break;
+			case 2: gameVar.r_resolution.set(1280, 720); break;
+			case 3: gameVar.r_resolution.set(1280, 800); break;
+			case 4: gameVar.r_resolution.set(1440, 900); break;
+			case 5: gameVar.r_resolution.set(1680, 1050); break;
+			case 6: gameVar.r_resolution.set(1920, 1080); break;
+			case 7: gameVar.r_resolution.set(1920, 1200); break;
+			case 8: gameVar.r_resolution.set(2560, 1440); break;
+			case 9: gameVar.r_resolution.set(3840, 2160); break;
+			default: gameVar.r_resolution.set(0, 0); break;
 			}
 		}
 		else
 		{
 			switch (lst_resolution->selectedIndex)
 			{
-			case 0: gameVar.r_resolution.set(640, 480); break;
-			case 1: gameVar.r_resolution.set(800, 600); break;
-			case 2: gameVar.r_resolution.set(1024, 768); break;
-			case 3: gameVar.r_resolution.set(1280, 960); break;
-			case 4: gameVar.r_resolution.set(1600, 1200); break;
-			default: gameVar.r_resolution.set(800, 600); break;
+			case 0: gameVar.r_resolution.set(0, 0); break;
+			case 1: gameVar.r_resolution.set(640, 480); break;
+			case 2: gameVar.r_resolution.set(800, 600); break;
+			case 3: gameVar.r_resolution.set(1024, 768); break;
+			case 4: gameVar.r_resolution.set(1152, 864); break;
+			case 5: gameVar.r_resolution.set(1280, 960); break;
+			case 6: gameVar.r_resolution.set(1280, 1024); break;
+			case 7: gameVar.r_resolution.set(1400, 1050); break;
+			case 8: gameVar.r_resolution.set(1600, 1200); break;
+			case 9: gameVar.r_resolution.set(2048, 1536); break;
+			default: gameVar.r_resolution.set(0, 0); break;
 			}
 		}
 
@@ -831,24 +869,34 @@ void COption::Validate(CControl * control)
 		{
 			switch (lst_resolution->selectedIndex)
 			{
-			case 0: gameVar.r_resolution.set(960, 600); break;
-			case 1: gameVar.r_resolution.set(1280, 800); break;
-			case 2: gameVar.r_resolution.set(1440, 900); break;
-			case 3: gameVar.r_resolution.set(1680, 1050); break;
-			case 4: gameVar.r_resolution.set(1920, 1200); break;
-			default: gameVar.r_resolution.set(1280, 800); break;
+			case 0: gameVar.r_resolution.set(0, 0); break;
+			case 1: gameVar.r_resolution.set(960, 600); break;
+			case 2: gameVar.r_resolution.set(1280, 720); break;
+			case 3: gameVar.r_resolution.set(1280, 800); break;
+			case 4: gameVar.r_resolution.set(1440, 900); break;
+			case 5: gameVar.r_resolution.set(1680, 1050); break;
+			case 6: gameVar.r_resolution.set(1920, 1080); break;
+			case 7: gameVar.r_resolution.set(1920, 1200); break;
+			case 8: gameVar.r_resolution.set(2560, 1440); break;
+			case 9: gameVar.r_resolution.set(3840, 2160); break;
+			default: gameVar.r_resolution.set(0, 0); break;
 			}
 		}
 		else
 		{
 			switch (lst_resolution->selectedIndex)
 			{
-			case 0: gameVar.r_resolution.set(640, 480); break;
-			case 1: gameVar.r_resolution.set(800, 600); break;
-			case 2: gameVar.r_resolution.set(1024, 768); break;
-			case 3: gameVar.r_resolution.set(1280, 960); break;
-			case 4: gameVar.r_resolution.set(1600, 1200); break;
-			default: gameVar.r_resolution.set(800, 600); break;
+			case 0: gameVar.r_resolution.set(0, 0); break;
+			case 1: gameVar.r_resolution.set(640, 480); break;
+			case 2: gameVar.r_resolution.set(800, 600); break;
+			case 3: gameVar.r_resolution.set(1024, 768); break;
+			case 4: gameVar.r_resolution.set(1152, 864); break;
+			case 5: gameVar.r_resolution.set(1280, 960); break;
+			case 6: gameVar.r_resolution.set(1280, 1024); break;
+			case 7: gameVar.r_resolution.set(1400, 1050); break;
+			case 8: gameVar.r_resolution.set(1600, 1200); break;
+			case 9: gameVar.r_resolution.set(2048, 1536); break;
+			default: gameVar.r_resolution.set(0, 0); break;
 			}
 		}
 		switch (lst_bitDepth->selectedIndex)
