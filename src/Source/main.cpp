@@ -913,7 +913,6 @@ static int RunGraphicalClient(const char* cmdLine)
 		console->sendCommand( str );
 	}
 
-
 	// La loop principal
 /*	try
 	{*/

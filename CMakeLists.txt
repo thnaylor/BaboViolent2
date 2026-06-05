@@ -18,7 +18,7 @@ endif()
 # Some compiler flags
 set(CMAKE_CXX_STANDARD 11) # C++11
 if (MSVC)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" "/MP") # Multi core in VS
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" "/MP /FS") # Multi core + serialised PDB writes
 endif()
 
 # Define _DEBUG
@@ -154,10 +154,13 @@ else()
 	endif()
 endif()
 
-# OpenGL
+# OpenGL — headers only on Windows (BrebisGL loads opengl32.dll at runtime;
+# linking opengl32.lib would duplicate the symbols BrebisGL defines as function pointers)
 find_package(OpenGL REQUIRED)
 list(APPEND includes PUBLIC ${OPENGL_INCLUDE_DIR})
-list(APPEND libs ${OPENGL_LIBRARIES})
+if (NOT WIN32)
+    list(APPEND libs ${OPENGL_LIBRARIES})
+endif()
 
 # Dear imgui
 list(APPEND src_thirdparty_imgui
@@ -226,6 +229,10 @@ endif()
 # Client (graphical)
 if(WIN32)
     add_executable(BaboViolent WIN32 ${BV2_COMMON_SOURCES})
+    # BrebisGL defines GL functions as function pointers; opengl32.lib also exports them.
+    # /FORCE:MULTIPLE lets BrebisGL's definitions win. opengl32.lib is still needed for
+    # wglGetProcAddress and functions accessed via the legacy <GL/gl.h> include path.
+    target_link_options(BaboViolent PRIVATE /FORCE:MULTIPLE /ignore:4006)
 else()
     add_executable(BaboViolent ${BV2_COMMON_SOURCES})
 endif()
