@@ -1,9 +1,6 @@
 services:
   baboviolent2:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-    image: baboviolent2:latest
+    image: ghcr.io/thnaylor/baboviolent2:edge
     ports:
       - "3333:3333/tcp"
       - "3333:3333/udp"
