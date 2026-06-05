@@ -1,0 +1,88 @@
+services:
+  baboviolent2:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: baboviolent2:latest
+    ports:
+      - "3333:3333/tcp"
+      - "3333:3333/udp"
+    environment:
+      # Server identity
+      GAME_MODE: FFA              # FFA | CTF | TDM | Champion
+      SERVER_NAME: "BaboViolent 2 Server"
+      MAX_PLAYERS: 32
+      MAX_PLAYERS_IN_GAME: 0      # 0 = no spectator limit; set equal to MAX_PLAYERS to disable spectating
+      PORT: 3333
+      PASSWORD: ""               # leave empty for no password
+      GAME_PUBLIC: "true"        # true = register on master server
+      ADMIN_USER: ""
+      ADMIN_PASS: ""
+
+      # Server UX
+      SEND_JOIN_MESSAGE: "true"
+      JOIN_MESSAGE: "Welcome to the server!"
+      MAX_PING: 1000             # kick players above this ping; 1000 = disabled
+      SHOW_KILLS: "true"
+      MAX_UPLOAD_RATE: 8         # KB/s upload cap per client
+
+      # Gameplay
+      FRIENDLY_FIRE: "false"
+      REFLECTED_DAMAGE: "true"
+      RESPAWN_TIME: 5            # seconds
+      FORCE_RESPAWN: "false"
+      ROUND_TIME_LIMIT: 360      # seconds
+      GAME_TIME_LIMIT: 900       # seconds
+      SCORE_LIMIT: 50
+      WIN_LIMIT: 7
+      BOMB_TIME: 60              # seconds (CTF/bomb mode)
+      SLIDE_ON_ICE: "false"
+      SHOW_ENEMY_TAG: "true"
+      AUTO_BALANCE: "true"      # recommended true for CTF / TDM
+      AUTO_BALANCE_TIME: 4       # seconds before teams are rebalanced
+      ENABLE_VOTE: "true"
+      SPAWN_IMMUNITY_TIME: 2     # invincibility seconds after spawn
+      MIN_TILES_PER_BABO: 55    # minimum map size filter (tiles per player)
+      MAX_TILES_PER_BABO: 80    # maximum map size filter (tiles per player)
+
+      # Weapon enables
+      ENABLE_SMG: "true"
+      ENABLE_SHOTGUN: "true"
+      ENABLE_SNIPER: "true"
+      ENABLE_DUAL_MG: "true"
+      ENABLE_CHAIN_GUN: "true"
+      ENABLE_BAZOOKA: "true"
+      ENABLE_SHOTGUN_RELOAD: "true"
+      ENABLE_FLAMETHROWER: "true"
+      ENABLE_PHOTON_RIFLE: "true"
+      ENABLE_SECONDARY: "true"
+      ENABLE_KNIVES: "true"
+      ENABLE_MOLOTOV: "true"
+      ENABLE_SHIELD: "true"
+      ENABLE_MINIBOT: "false"
+      ENABLE_NUCLEAR: "false"
+      EXPLODING_FT: "false"      # flamethrower projectiles explode on impact
+
+      # Weapon stats
+      ZOOKA_REMOTE_DET: "true"
+      SMG_DAMAGE: 0.1
+      DMG_DAMAGE: 0.14
+      CG_DAMAGE: 0.16
+      SNIPER_DAMAGE: 0.34
+      SHOTTY_DAMAGE: 0.21
+      SHOTTY_DROP_RADIUS: 0.35
+      SHOTTY_RANGE: 6.75
+      ZOOKA_DAMAGE: 0.85
+      ZOOKA_RADIUS: 2
+      NUKE_RADIUS: 6
+      NUKE_TIMER: 3
+      NUKE_RELOAD: 12
+      FT_DAMAGE: 0.065
+      FT_MAX_RANGE: 8
+      FT_MIN_RANGE: 1
+      FT_EXPIRATION_TIMER: 1.5
+      PHOTON_DAMAGE_COEFF: 0.65
+      PHOTON_DIST_MULT: 0.65
+      PHOTON_VERTICAL_SHIFT: 0.5
+      PHOTON_HORIZONTAL_SHIFT: 2
+      PHOTON_TYPE: 1
