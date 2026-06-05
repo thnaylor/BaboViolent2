@@ -39,10 +39,17 @@ $Stage   = Join-Path $Root (Join-Path $OutDir $PkgName)
 if (Test-Path $Stage) { Remove-Item $Stage -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $Stage | Out-Null
 
+Write-Host "Copying Content/..."
+Copy-Item -Path (Join-Path $Root "Content") -Destination (Join-Path $Stage "Content") -Recurse
+
+# Exes and DLLs go inside Content/ so main\bv2.cfg is found immediately —
+# no relocation logic needed.
+$ContentStage = Join-Path $Stage "Content"
+
 Write-Host "Copying executables..."
-Copy-Item -Path $ServerExe -Destination (Join-Path $Stage "BaboViolentDedicated.exe")
+Copy-Item -Path $ServerExe -Destination (Join-Path $ContentStage "BaboViolentDedicated.exe")
 if (Test-Path $ClientExe) {
-    Copy-Item -Path $ClientExe -Destination (Join-Path $Stage "BaboViolent.exe")
+    Copy-Item -Path $ClientExe -Destination (Join-Path $ContentStage "BaboViolent.exe")
 } else {
     Write-Warning "Client exe not found - server-only package"
 }
@@ -72,7 +79,7 @@ if ($CrtDir) {
     foreach ($dll in $DllsToCopy) {
         $src = Join-Path $CrtDir $dll
         if (Test-Path $src) {
-            Copy-Item -Path $src -Destination (Join-Path $Stage $dll)
+            Copy-Item -Path $src -Destination (Join-Path $ContentStage $dll)
             Write-Host "  $dll"
         }
     }
@@ -80,19 +87,14 @@ if ($CrtDir) {
     Write-Warning "MSVC CRT not found - users may need VC++ Redistributable"
 }
 
-Write-Host "Copying Content/..."
-Copy-Item -Path (Join-Path $Root "Content") -Destination (Join-Path $Stage "Content") -Recurse
-
 $readme = @(
     "BaboViolent 2 (Windows x86_64)"
     "-------------------------------"
-    "PLAY:   Double-click BaboViolent.exe"
-    "HOST:   Double-click BaboViolentDedicated.exe  (starts FFA by default)"
+    "PLAY:   Double-click Content\BaboViolent.exe"
+    "HOST:   Double-click Content\BaboViolentDedicated.exe  (starts FFA by default)"
     "        Or from a command prompt:"
-    "          BaboViolentDedicated.exe CTF"
-    "          BaboViolentDedicated.exe TDM"
-    ""
-    "Game content is in the Content\ folder next to the .exe files."
+    "          Content\BaboViolentDedicated.exe CTF"
+    "          Content\BaboViolentDedicated.exe TDM"
 )
 $readme | Out-File -FilePath (Join-Path $Stage "README.txt") -Encoding utf8
 
