@@ -247,10 +247,12 @@ endif()
 # Client (graphical)
 if(WIN32)
     add_executable(BaboViolent WIN32 ${BV2_COMMON_SOURCES})
-    # BrebisGL defines GL functions as function pointers; opengl32.lib also exports them.
-    # /FORCE:MULTIPLE lets BrebisGL's definitions win. opengl32.lib is still needed for
-    # wglGetProcAddress and functions accessed via the legacy <GL/gl.h> include path.
-    target_link_options(BaboViolent PRIVATE /FORCE:MULTIPLE /ignore:4006)
+    if(MSVC)
+        # BrebisGL defines GL functions as function pointers; opengl32.lib also exports them.
+        # /FORCE:MULTIPLE lets BrebisGL's definitions win. opengl32.lib is still needed for
+        # wglGetProcAddress and functions accessed via the legacy <GL/gl.h> include path.
+        target_link_options(BaboViolent PRIVATE /FORCE:MULTIPLE /ignore:4006)
+    endif()
 else()
     add_executable(BaboViolent ${BV2_COMMON_SOURCES})
 endif()
