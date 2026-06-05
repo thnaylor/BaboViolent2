@@ -18,10 +18,13 @@
 
 #ifdef WIN32
 #define _WIN32_WINNT 0x0400
+#include <windows.h>
 #endif
 
 #ifndef WIN32
 	#include "LinuxHeader.h"
+	#include <sys/stat.h>
+	#include <unistd.h>
 #endif
 
 #include "Zeven.h"
@@ -48,6 +51,50 @@
 	#endif
 #endif
 
+
+// Find Content/ relative to the executable and chdir into it when we are not
+// already positioned there.  This lets users double-click the .exe from a flat
+// layout (exe + DLLs + Content/ all in the same folder) without needing a
+// wrapper .bat or .sh to set the working directory first.
+static void bv2_relocate_to_content()
+{
+#ifdef WIN32
+    // Already in the right place?
+    if (GetFileAttributesA("main\\bv2.cfg") != INVALID_FILE_ATTRIBUTES)
+        return;
+
+    char exeDir[MAX_PATH];
+    if (!GetModuleFileNameA(NULL, exeDir, MAX_PATH))
+        return;
+    char *sep = strrchr(exeDir, '\\');
+    if (sep) *sep = '\0';
+
+    char content[MAX_PATH];
+    snprintf(content, MAX_PATH, "%s\\Content", exeDir);
+    DWORD attr = GetFileAttributesA(content);
+    if (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY))
+        SetCurrentDirectoryA(content);
+#else
+    // Already in the right place?  (run.sh already cds here, so this is a
+    // no-op for the normal script-launched case.)
+    struct stat st;
+    if (stat("main/bv2.cfg", &st) == 0)
+        return;
+
+    char exePath[4096];
+    ssize_t len = readlink("/proc/self/exe", exePath, sizeof(exePath) - 1);
+    if (len <= 0)
+        return;
+    exePath[len] = '\0';
+    char *sep = strrchr(exePath, '/');
+    if (sep) *sep = '\0';
+
+    char content[4096];
+    snprintf(content, sizeof(content), "%s/Content", exePath);
+    if (stat(content, &st) == 0 && S_ISDIR(st.st_mode))
+        chdir(content);
+#endif
+}
 
 // notre scene
 Scene * scene = 0;
@@ -475,6 +522,8 @@ int main(int argc, const char* argv[])
 
 	// lil print out so that people now know that its working
 
+	bv2_relocate_to_content();
+
 	printf("***************************************\n");
 	printf("*   Babo Violent 2 Dedicated Server   *\n");
 	printf("*   Version %-26s*\n", BV2_RELEASE_STRING);
@@ -708,6 +757,8 @@ int main(int argc, const char* argv[])
 //
 static int RunGraphicalClient(const char* cmdLine)
 {
+	bv2_relocate_to_content();
+
 	// PREMI�E CHOSE �FAIRE, on load les config
 	dksvarInit(&stringInterface);
 	dksvarLoadConfig("main/bv2.cfg");

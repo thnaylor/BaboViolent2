@@ -20,7 +20,7 @@
 #define _SERVER_H
 
 #include "baboNet.h"
-#include "cClient.h"
+#include "CClient.h"
 #include "cIncConnection.h"
 
 

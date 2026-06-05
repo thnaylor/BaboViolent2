@@ -18,7 +18,7 @@
 #include "baboNet.h"		//les fonctions visible au user
 #include "../Version.h"
 #include "cServer.h"
-#include "cClient.h"		//nos objets clients
+#include "CClient.h"		//nos objets clients
 #include "cPacket.h"		//nos packet
 #include "cPeer2Peer.h"		//lobjet qui gere toute ce quier peer2peer
 
