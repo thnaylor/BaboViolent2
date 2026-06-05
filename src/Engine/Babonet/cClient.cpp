@@ -82,6 +82,19 @@ cClient::cClient(sockaddr_in *ip, int fileDescriptor,UINT4 netID)
 	//add the new file descriptor to this clients fd
 	FD_SET( (unsigned int)(FileDescriptor) , &masterS );
 
+#ifndef WIN32
+	// On Linux/Docker the game-loop thread calls send() synchronously; a full
+	// TCP buffer blocks forever and freezes the timer.  Cap all sends on this
+	// socket at 100 ms so the loop can always continue.
+	{
+		struct timeval tv;
+		tv.tv_sec  = 0;
+		tv.tv_usec = 100000; // 100 ms
+		setsockopt(FileDescriptor, SOL_SOCKET, SO_SNDTIMEO,
+		           (const char*)&tv, sizeof(tv));
+	}
+#endif
+
 	//Unused: char *IP			=	inet_ntoa(ipAdress.sin_addr);
 	//Unused: unsigned short port		=	ntohs(ipAdress.sin_port);
 
@@ -845,116 +858,92 @@ cPacket* cClient::GetReadyPacket()
 
 int cClient::Send(UINT4 &nbByte)
 {
-	//on va envoyer les packets en attente dans la liste PacketsTCP
+	if(!PacketsToSend) { return 0; }
 
 	int	packed			=	0;
 	char	*buf		=	new char[3072];
 	char	NbPacket	=	0;
 
+	//on parse notre key (4-byte RND1 tag; do not use sizeof(UINT4) — 8 bytes on LP64)
+	memcpy(buf + packed,&Key,sizeof(char)*4);
+	packed += 4;
 
-	if(PacketsToSend)
-	{
+	//on parse le packetID
+	char pid[5];
+	GetLastPacketID(pid);
+	memcpy(buf + packed,&(pid),sizeof(char) * 4);
+	packed += (sizeof(char) * 4) + 1; //+1 pour laisser 1 place pour le nombre de packet
 
-		//on parse notre key (4-byte RND1 tag; do not use sizeof(UINT4) — 8 bytes on LP64)
-		memcpy(buf + packed,&Key,sizeof(char)*4);
-		packed += 4;
-	
-		//on parse le packetID
-		char pid[5];
-		GetLastPacketID(pid);
-		memcpy(buf + packed,&(pid),sizeof(char) * 4);
-		packed += (sizeof(char) * 4) + 1; //+1 pour laisser 1 place pour le nombre de packet
-	}
-	
-
-	cPacket *toKill=0;
-	for(cPacket *p=PacketsToSend;p;delete toKill)
+	// Collect one batch into buf WITHOUT removing packets from the queue yet.
+	// Packets are only deleted after a confirmed successful send, so EAGAIN
+	// (TCP send buffer full) leaves the queue intact and the frame is retried.
+	cPacket *batchEnd = 0;
+	for(cPacket *p = PacketsToSend; p; p = p->Next)
 	{
 		NbPacket++;
 
 		stHeader header;
+		header.Size		= p->Size;
+		header.typeID	= p->TypeID;
 
-		header.Size		=	p->Size;
-		header.typeID	=	p->TypeID;
-				
-		memcpy(buf + packed,&header,sizeof(stHeader));
+		memcpy(buf + packed, &header, sizeof(stHeader));
 		packed += sizeof(stHeader);
 
-		//on parse le data
 		if(header.Size)
 		{
-			memcpy(buf + packed,p->Data,header.Size);
+			memcpy(buf + packed, p->Data, header.Size);
 			packed += header.Size;
 		}
 
-		
-		if(packed >= DataRate) //on est pret a envoyer une premier bacth
-		{
-			//on copie le nombre de packet qui sen vient
-			memcpy(&(buf[8]),&NbPacket,sizeof(char));
+		batchEnd = p;
 
-			int sent	=	0;
-			
-			while(sent < packed)
-			{
-				int iSent=0;
-				iSent = send(FileDescriptor,buf + sent,packed - sent,0);
-
-				if(iSent <= 0)
-				{
-					printf("Problem sending packets in cClient::Send() \n");
-					//sprintf(LastError,"Problem sending packets in cClient::Send()");
-					delete [] buf;
-					return 1;
-				}
-
-				sent += iSent;
-			}
-			nbByte += packed;
-			packed = 0;
-
-			toKill = p;
-			PacketsToSend=p=p->Next;
-			
-			delete [] buf;
-
-			delete toKill;
-			return 0;
-		}
-
-		toKill = p;
-		PacketsToSend=p=p->Next;
+		if(packed >= DataRate)
+			break;
 	}
 
-	if(packed)
+	memcpy(&(buf[8]), &NbPacket, sizeof(char));
+
+	int sent = 0;
+	while(sent < packed)
 	{
-
-		memcpy(&(buf[8]),&NbPacket,sizeof(char));
-
-		int sent	=	0;
-		
-		while(sent < packed)
+		int iSent = 0;
+		#ifdef WIN32
+		iSent = send(FileDescriptor, buf + sent, packed - sent, 0);
+		#else
+		iSent = send(FileDescriptor, buf + sent, packed - sent, MSG_DONTWAIT);
+		if(iSent < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
 		{
-			int iSent=0;
-			iSent = send(FileDescriptor,buf + sent,packed - sent,0);
+			// TCP send buffer full — queue untouched, retry next frame.
+			delete [] buf;
+			return 0;
+		}
+		#endif
 
-			if(iSent <= 0)
-			{
-				printf("Problem sending packets in cClient::Send() \n");
-				//sprintf(LastError,"Problem sending packets in cClient::Send()");
-				delete [] buf;
-				return 1;
-			}
-
-			sent += iSent;
+		if(iSent <= 0)
+		{
+			printf("Problem sending packets in cClient::Send() \n");
+			delete [] buf;
+			return 1;
 		}
 
-		nbByte += packed;
+		sent += iSent;
+	}
+
+	nbByte += packed;
+
+	// Send succeeded — now remove the batch from the queue.
+	for(cPacket *p = PacketsToSend; ; )
+	{
+		cPacket *next = p->Next;
+		bool last = (p == batchEnd);
+		PacketsToSend = next;
+		delete p;
+		if(last) break;
+		p = next;
 	}
 
 	delete [] buf;
 	return 0;
-
 }
 
 void cClient::GetLastPacketID(char *pid)

@@ -352,10 +352,15 @@ public:
 			// On va updater notre timer
 			int nbFrameElapsed = dkcUpdateTimer();
 
+			// Cap catch-up: if the scheduler delayed us (common in containers/VMs),
+			// dkcUpdateTimer returns a huge burst count.  Processing hundreds of
+			// frames in one shot floods the TCP send buffer and blocks send() forever.
+			if (nbFrameElapsed > 4) nbFrameElapsed = 4;
+
 			// On va chercher notre delay
 			float delay = dkcGetElapsedf();
 
-			// On passe le nombre de frame �animer
+			// On passe le nombre de frame�animer
 			while (nbFrameElapsed)
 			{
 				// Update la console
@@ -637,23 +642,24 @@ int main(int argc, const char* argv[])
 	{
 		std::cin.getline(input,256);
 
-
-		mainLoopConsole.lock();
 		if(std::cin.gcount())
-			console->sendCommand(input);//CString("Execute CTF"));
-		mainLoopConsole.unlock();
-
+		{
+			mainLoopConsole.lock();
+			console->sendCommand(input);
+			mainLoopConsole.unlock();
+		}
 
 		#ifdef WIN32
-			Sleep(1);
-
+			Sleep(std::cin.fail() ? 100 : 1);
 		#else
-			if(nanosleep(&ts,0))
-			{
-				printf("problem nanosleep console loop\n");
-			}
-			ts.tv_sec = 0;
-			ts.tv_nsec = 1000000;
+		{
+			// Sleep longer when stdin is exhausted (Docker/headless) so we don't
+			// spin at 1000 Hz and starve the game-loop thread via constant locking.
+			struct timespec sleep_ts;
+			sleep_ts.tv_sec  = 0;
+			sleep_ts.tv_nsec = std::cin.fail() ? 100000000L : 1000000L; // 100ms or 1ms
+			nanosleep(&sleep_ts, 0);
+		}
 		#endif
 
 		//cin.ignore( 10000 , '\n');

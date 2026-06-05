@@ -149,12 +149,20 @@ int cIncConnection::Update()
 
 						while(sent < 37)
 						{
+							#ifdef WIN32
 							nbytes = send(NewFD,buf + sent,37-sent,0);
+							#else
+							nbytes = send(NewFD,buf + sent,37-sent,MSG_DONTWAIT);
+							if(nbytes < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
+							{
+								// Send buffer not ready yet — skip for this frame, retry next.
+								return 0;
+							}
+							#endif
 							if(nbytes <= 0)
 							{
 								//probleme a envoyer le id
 								printf("Problem send()ing connID to client\n");
-								//sprintf(LastError,"Problem send()ing connID to client");
 
 								//on elimine le client, il se reconnectera simplement
 								FD_CLR((unsigned int)(NewFD),&master);
@@ -164,7 +172,7 @@ int cIncConnection::Update()
 							}
 
 							sent += nbytes;
-							
+
 						}
 
 						if(UDPenabled)

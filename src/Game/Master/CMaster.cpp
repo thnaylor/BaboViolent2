@@ -1021,6 +1021,12 @@ void CMaster::sendPacket(const char* in_data, int in_size, int in_ID, bool disco
 	//--- Are we connected? (uniqueClientID is our BaboNet TCP client to the master, not "is the master binary up".)
 	if (!uniqueClientID)
 	{
+		// Never attempt a master-server DNS lookup when the server is private.
+		// gethostbyname() is synchronous and blocks the game-loop thread for the
+		// full DNS timeout (~10-15 s) when the master is unreachable.
+		if (!gameVar.sv_gamePublic)
+			return;
+
 		//--- Connect us first (session was closed, never opened, or cleared after an error)
 		connectToMaster( m_IP , m_Port );
 		if (console && (gameVar.c_debug || gameVar.c_netlog))
