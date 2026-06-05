@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 
+# CMake 4.x removed support for cmake_minimum_required(VERSION < 3.5) in
+# subdirectories. Set this before any add_subdirectory so vendored deps
+# (SDL 2.0.8 requires 2.8.11, libogg requires 2.8.12) don't error.
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "4.0")
+    set(CMAKE_POLICY_VERSION_MINIMUM "2.8.11" CACHE INTERNAL "")
+endif()
+
 # Define LINUX
 if (UNIX AND NOT APPLE)
     set(LINUX 1)
