@@ -81,7 +81,7 @@ struct CoordFrame
 		long size = to.frameID - from.frameID;
 		if (cFProgression > size)
 		{
-			if (cFProgression < 15)
+			if (cFProgression < 30)
 			{
 				// On le fait avancer normalement avec sa velocity
 				position += vel * delay;

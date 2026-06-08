@@ -28,6 +28,7 @@ services:
       MAX_PING: 1000             # kick players above this ping; 1000 = disabled
       SHOW_KILLS: "true"
       MAX_UPLOAD_RATE: 8         # KB/s upload cap per client
+      MAX_SEND_INTERVAL: 5       # max frames between position updates; 0 = no cap (lower = smoother on high ping)
 
       # Gameplay
       FRIENDLY_FIRE: "false"

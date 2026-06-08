@@ -1054,7 +1054,10 @@ void Server::update(float delay)
 				if (game->players[i])
 				{
 					game->players[i]->sendPosFrame++;
-					if (game->players[i]->sendPosFrame >= game->players[i]->avgPing && game->players[i]->sendPosFrame >= gameVar.sv_minSendInterval + nbPlayers/8)
+					int clampedPing = game->players[i]->avgPing;
+					if (gameVar.sv_maxSendInterval > 0 && clampedPing > gameVar.sv_maxSendInterval)
+						clampedPing = gameVar.sv_maxSendInterval;
+					if (game->players[i]->sendPosFrame >= clampedPing && game->players[i]->sendPosFrame >= gameVar.sv_minSendInterval + nbPlayers/8)
 					{
 						game->players[i]->sendPosFrame = 0;
 

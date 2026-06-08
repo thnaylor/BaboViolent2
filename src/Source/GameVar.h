@@ -90,6 +90,7 @@ public:
 	float sv_timeToSpawn;
 	bool sv_topView;
 	int sv_minSendInterval;
+	int sv_maxSendInterval;
 	bool sv_forceRespawn;
 	bool sv_baboStats;
 	float sv_roundTimeLimit;

@@ -72,6 +72,7 @@ docker run -d \
 | `MAX_PING` | `1000` | Kick players above this ping; `1000` = effectively disabled |
 | `SHOW_KILLS` | `false` | Show kill feed |
 | `MAX_UPLOAD_RATE` | `8` | Server upload rate cap in KB/s per client |
+| `MAX_SEND_INTERVAL` | `5` | Max frames between position updates sent to each client; `0` = no cap. Lower values improve smoothness for high-ping players at the cost of slightly more bandwidth. |
 
 ### Gameplay
 

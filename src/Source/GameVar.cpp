@@ -351,6 +351,9 @@ GameVar::GameVar()
 	sv_minSendInterval = 2;
 	dksvarRegister(CString("sv_minSendInterval [int : (default 2)]"), &sv_minSendInterval, 0, 5,
 		LIMIT_MIN | LIMIT_MAX, true);
+	sv_maxSendInterval = 5;
+	dksvarRegister(CString("sv_maxSendInterval [int : cap on ping-adaptive send delay in frames, 0 = no cap (default 5)]"), &sv_maxSendInterval, 0, 0,
+		LIMIT_MIN, true);
 	sv_forceRespawn = false;
 	dksvarRegister(CString("sv_forceRespawn [bool : (default false)]"), &sv_forceRespawn, true);
 	sv_baboStats = false;
@@ -855,6 +858,7 @@ void GameVar::sendSVVar(UINT4 babonetID)
 	sendOne("sv_timeToSpawn", babonetID);
 	sendOne("sv_topView", babonetID);
 	sendOne("sv_minSendInterval", babonetID);
+	sendOne("sv_maxSendInterval", babonetID);
 	sendOne("sv_forceRespawn", babonetID);
 	sendOne("sv_baboStats", babonetID);
 	sendOne("sv_roundTimeLimit", babonetID);
@@ -935,6 +939,7 @@ void GameVar::sendSVVar(INT4 peerId)
 	sendOne("sv_timeToSpawn", peerId);
 	sendOne("sv_topView", peerId);
 	sendOne("sv_minSendInterval", peerId);
+	sendOne("sv_maxSendInterval", peerId);
 	sendOne("sv_forceRespawn", peerId);
 	sendOne("sv_baboStats", peerId);
 	sendOne("sv_roundTimeLimit", peerId);
