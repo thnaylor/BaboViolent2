@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.0.1](https://github.com/thnaylor/BaboViolent2/compare/v4.0.0...v4.0.1) (2026-06-08)
+
+
+### Bug Fixes
+
+* **net:** UINT4 wrong size on 64-bit Linux breaks ping handshake ([474c579](https://github.com/thnaylor/BaboViolent2/commit/474c579de2a9784f546add033d511a91c4c455d7))
+* **packaging:** Windows CI release now uses flat layout matching package-windows.ps1 ([c09a375](https://github.com/thnaylor/BaboViolent2/commit/c09a375d278cb503014e4fb1846efadfdacff572))
+
 ## [4.0.0](https://github.com/thnaylor/BaboViolent2/compare/v3.1.1...v4.0.0) (2026-06-06)
 
 
