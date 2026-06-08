@@ -157,6 +157,7 @@ struct PlayerStats
 };
 
 #define PING_LOG_SIZE 60
+#define CF_BUFFER_SIZE 8
 
 #if defined(_PRO_)
 
@@ -317,6 +318,16 @@ public:
 	// Sa progression sur la courbe
 	long cFProgression;
 
+#ifndef DEDICATED_SERVER
+	// Jitter buffer: absorbs variable packet arrival timing so interpolation
+	// always has two bracketing frames to work with.
+	CoordFrame cfBuffer[CF_BUFFER_SIZE];
+	int        cfBufferCount;
+	long       latestBufferedFrameID;
+	long       renderFrameID;
+	bool       cfBufferInitialized;
+#endif
+
 	// sa matrice d'orientation (� c'est client side only)
 	CMatrix3x3f matrix;
 
@@ -469,6 +480,9 @@ public:
 	void setCoordFrame(net_clsv_svcl_player_coord_frame & playerCoordFrame);
 #if defined(_PRO_)
 	void setCoordFrameMinibot(net_svcl_minibot_coord_frame & minibotCoordFrame);
+#endif
+#ifndef DEDICATED_SERVER
+	void advanceBuffer();
 #endif
 
 	// Si on se fait toucher !

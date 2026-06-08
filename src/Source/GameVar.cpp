@@ -570,6 +570,8 @@ GameVar::GameVar()
 	dksvarRegister(CString("cl_mapAuthorName [string : \"\" (default \"\", max 24 characters)]"), &cl_mapAuthorName, true);
 	cl_cubicMotion = true;
 	dksvarRegister(CString("cl_cubicMotion [bool : true | false (default true)]"), &cl_cubicMotion, true);
+	cl_interpDelay = 6;
+	dksvarRegister(CString("cl_interpDelay [int : jitter buffer depth in frames, higher = smoother on variable connections (default 6)]"), &cl_interpDelay, 1, 30, LIMIT_MIN | LIMIT_MAX, true);
 	cl_lastUsedIP = "0.0.0.0";
 	dksvarRegister(CString("cl_lastUsedIP [string : \"\"]"), &cl_lastUsedIP, true);
 	cl_port = 3333;

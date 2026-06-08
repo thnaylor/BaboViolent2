@@ -134,6 +134,11 @@ Player::Player(char pPlayerID, Map * pMap, Game * pGame): pingLogInterval(0.05f)
 	//qObj = gluNewQuadric();
 #endif
 	isThisPlayer = false;
+	cfBufferCount = 0;
+	latestBufferedFrameID = 0;
+	renderFrameID = 0;
+	cfBufferInitialized = false;
+	memset(cfBuffer, 0, sizeof(cfBuffer));
 #endif
 	timeToSpawn = gameVar.sv_timeToSpawn;
 	remoteEntity = true;
@@ -853,6 +858,13 @@ void Player::spawn(const CVector3f & spawnPoint)
 	netCF0.reset();
 	netCF1.reset();
 	cFProgression = 0;
+#ifndef DEDICATED_SERVER
+	cfBufferCount = 0;
+	latestBufferedFrameID = 0;
+	renderFrameID = 0;
+	cfBufferInitialized = false;
+	memset(cfBuffer, 0, sizeof(cfBuffer));
+#endif
 
 	grenadeDelay = 0;
 	meleeDelay = 0;
@@ -1515,49 +1527,134 @@ void Player::setThisPlayerInfo()
 //
 void Player::setCoordFrame(net_clsv_svcl_player_coord_frame & playerCoordFrame)
 {
-	if (playerID != playerCoordFrame.playerID) return; // Wtf c pas le bon player!? (Pas suposer arriver)
+	if (playerID != playerCoordFrame.playerID) return;
 
-	// On check si ce n'est pas un out of order data
+#ifdef DEDICATED_SERVER
+	// Server path: update netCF1 directly so the server has the latest client position.
 	if (netCF1.frameID > playerCoordFrame.frameID) return;
 
-	// Notre dernier keyframe change pour celui qu'on est rendu
 	netCF0 = currentCF;
-	netCF0.frameID = netCF1.frameID; // On pogne le frameID de l'ancien packet par contre
-	cFProgression = 0; // On commence au d�ut de la courbe ;)
+	netCF0.frameID = netCF1.frameID;
+	cFProgression = 0;
 
-	// On donne la nouvelle velocity �notre entity
 	currentCF.vel[0] = (float)playerCoordFrame.vel[0] / 10.0f;
 	currentCF.vel[1] = (float)playerCoordFrame.vel[1] / 10.0f;
 	currentCF.vel[2] = (float)playerCoordFrame.vel[2] / 10.0f;
 
-#if defined(_PRO_)
-	currentCF.camPosZ = (float)playerCoordFrame.camPosZ;
-#endif
-
-	// Son frame ID
 	netCF1.frameID = playerCoordFrame.frameID;
-
-	// Va faloir interpoler ici et pr�ire (job's done!)
 	netCF1.position[0] = (float)playerCoordFrame.position[0] / 100.0f;
 	netCF1.position[1] = (float)playerCoordFrame.position[1] / 100.0f;
 	netCF1.position[2] = (float)playerCoordFrame.position[2] / 100.0f;
-
-	// Sa velocity (� aussi va faloir l'interpoler jcr�ben
 	netCF1.vel[0] = (char)playerCoordFrame.vel[0] / 10.0f;
 	netCF1.vel[1] = (char)playerCoordFrame.vel[1] / 10.0f;
 	netCF1.vel[2] = (char)playerCoordFrame.vel[2] / 10.0f;
-
-	// La position de la mouse
 	netCF1.mousePosOnMap[0] = (short)playerCoordFrame.mousePos[0] / 100.0f;
 	netCF1.mousePosOnMap[1] = (short)playerCoordFrame.mousePos[1] / 100.0f;
 	netCF1.mousePosOnMap[2] = (short)playerCoordFrame.mousePos[2] / 100.0f;
 
-	// Si notre frameID �ait �0, on le copie direct
-	if (netCF0.frameID == 0) 
-	{
+	if (netCF0.frameID == 0)
 		netCF0 = netCF1;
+#else
+	// Client path: push received frame into jitter buffer.
+	// advanceBuffer() picks the right bracket each tick; netCF0/netCF1 are
+	// not touched here so the render position never jumps on packet receipt.
+	long incomingFrameID = (long)playerCoordFrame.frameID;
+
+	// Reject duplicates
+	for (int i = 0; i < cfBufferCount; i++)
+		if (cfBuffer[i].frameID == incomingFrameID) return;
+
+	CoordFrame incoming;
+	incoming.frameID = incomingFrameID;
+	incoming.position[0] = (float)playerCoordFrame.position[0] / 100.0f;
+	incoming.position[1] = (float)playerCoordFrame.position[1] / 100.0f;
+	incoming.position[2] = (float)playerCoordFrame.position[2] / 100.0f;
+	incoming.vel[0] = (char)playerCoordFrame.vel[0] / 10.0f;
+	incoming.vel[1] = (char)playerCoordFrame.vel[1] / 10.0f;
+	incoming.vel[2] = (char)playerCoordFrame.vel[2] / 10.0f;
+	incoming.mousePosOnMap[0] = (short)playerCoordFrame.mousePos[0] / 100.0f;
+	incoming.mousePosOnMap[1] = (short)playerCoordFrame.mousePos[1] / 100.0f;
+	incoming.mousePosOnMap[2] = (short)playerCoordFrame.mousePos[2] / 100.0f;
+#if defined(_PRO_)
+	incoming.camPosZ = (float)playerCoordFrame.camPosZ;
+#endif
+
+	if (cfBufferCount < CF_BUFFER_SIZE) {
+		cfBuffer[cfBufferCount++] = incoming;
+	} else {
+		// Evict oldest entry to make room
+		int oldest = 0;
+		for (int i = 1; i < CF_BUFFER_SIZE; i++)
+			if (cfBuffer[i].frameID < cfBuffer[oldest].frameID) oldest = i;
+		cfBuffer[oldest] = incoming;
+	}
+
+	if (incomingFrameID > latestBufferedFrameID)
+		latestBufferedFrameID = incomingFrameID;
+
+	// Seed on first received packet
+	if (!cfBufferInitialized) {
+		renderFrameID = incomingFrameID - (long)gameVar.cl_interpDelay;
+		netCF0 = incoming;
+		netCF1 = incoming;
+		cfBufferInitialized = true;
+	}
+#endif
+}
+
+#ifndef DEDICATED_SERVER
+void Player::advanceBuffer()
+{
+	if (!cfBufferInitialized || cfBufferCount == 0) return;
+
+	long targetFrameID = latestBufferedFrameID - (long)gameVar.cl_interpDelay;
+
+	// Advance renderFrameID one step toward the target each game tick
+	if (renderFrameID < targetFrameID)
+		renderFrameID++;
+
+	// Find the two buffer entries that bracket renderFrameID:
+	//   bestA = highest frameID <= renderFrameID  (from-frame)
+	//   bestB = lowest  frameID >  renderFrameID  (to-frame)
+	int bestA = -1, bestB = -1;
+	for (int i = 0; i < cfBufferCount; i++) {
+		long fid = cfBuffer[i].frameID;
+		if (fid <= renderFrameID) {
+			if (bestA < 0 || fid > cfBuffer[bestA].frameID) bestA = i;
+		} else {
+			if (bestB < 0 || fid < cfBuffer[bestB].frameID) bestB = i;
+		}
+	}
+
+	// Not enough buffered history yet: use oldest available as from-frame
+	if (bestA < 0) {
+		bestA = 0;
+		for (int i = 1; i < cfBufferCount; i++)
+			if (cfBuffer[i].frameID < cfBuffer[bestA].frameID) bestA = i;
+	}
+
+	// No frame ahead of render point: interpolate() extrapolation handles this
+	if (bestB < 0) bestB = bestA;
+
+	if (netCF0.frameID != cfBuffer[bestA].frameID || netCF1.frameID != cfBuffer[bestB].frameID) {
+		netCF0 = cfBuffer[bestA];
+		netCF1 = cfBuffer[bestB];
+	}
+
+	// interpolate() does cFProgression++ first, so set one less than the
+	// desired (renderFrameID - netCF0.frameID) to compensate.
+	cFProgression = renderFrameID - netCF0.frameID - 1;
+	if (cFProgression < 0) cFProgression = 0;
+
+	// Evict frames older than the current from-frame
+	for (int i = 0; i < cfBufferCount; ) {
+		if (cfBuffer[i].frameID < netCF0.frameID)
+			cfBuffer[i] = cfBuffer[--cfBufferCount];
+		else
+			i++;
 	}
 }
+#endif
 
 #if defined(_PRO_) && defined(_MINIBOT_)
 void Player::setCoordFrameMinibot(net_svcl_minibot_coord_frame & minibotCoordFrame)

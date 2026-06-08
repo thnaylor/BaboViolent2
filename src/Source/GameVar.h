@@ -180,6 +180,7 @@ public:
 	CString cl_playerName;
 	CString cl_mapAuthorName;
 	bool cl_cubicMotion;
+	int cl_interpDelay;
 	CString cl_lastUsedIP;
 	int cl_port;
 	CString cl_password;

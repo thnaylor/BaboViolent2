@@ -239,6 +239,9 @@ void Player::update(float delay)
 
 		if (remoteEntity)
 		{
+#ifndef DEDICATED_SERVER
+			advanceBuffer();
+#endif
 			// L� on va cr�er une genre d'interpolation
 			currentCF.interpolate(cFProgression, netCF0, netCF1, delay);
 
