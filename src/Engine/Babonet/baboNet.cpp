@@ -665,6 +665,10 @@ char *bb_getMyIP()
     return ip;
     
 #else
+		// Allow overriding the announced IP (e.g. when running behind Docker NAT)
+		const char *sv_ip_override = getenv("SV_IP");
+		if (sv_ip_override && sv_ip_override[0]) return (char*)sv_ip_override;
+
 		unsigned char      *u;
 		int                sockfd, size  = 1;
 		struct ifreq       *ifr;

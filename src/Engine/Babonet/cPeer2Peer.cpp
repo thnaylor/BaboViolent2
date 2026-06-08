@@ -402,14 +402,12 @@ int cPeer2Peer::ReceiveFromPeers()
 			else
 			{
 				//cPeer *P	=	GetPeerByIP(fromIP);
-		
 				int nread=0;
 				while(nread < nbytes) //tant quia du data a lire
 				{
 					cUDPpacket *packet = ExtractPacket(buf,&nread);
 
 					BytesReceived += packet->Size;
-					
 					ReceiveDatagram(packet,fromIP);
 
 
@@ -725,19 +723,8 @@ void cPeer2Peer::AnalyzeSystemDatagram(cUDPpacket *packet,cPeer *fromPeer)
 		}
 		case TYPE_DEMAND:
 		{
-			//on recois une demande confirmation dun peer, on lui renvoie simplement le contenu de ce quil avait afin quil enregistre le bon port
-
-			//fp = fopen("_netDebug.txt","a");
-			//fprintf(fp,"	>ON RECOIT UNE DEMANDE DE %s:%i \n",inet_ntoa(fromPeer->IpAdress.sin_addr),ntohs(fromPeer->IpAdress.sin_port));
-			//fclose(fp);
-			
-
 			fromPeer->AddAck(packet->ID);
 			if(fromPeer->Confirmed) return;
-			
-			//fp = fopen("_netDebug.txt","a");
-			//fprintf(fp,"	>ON ENVOIE UNE CONFIRMATION \n");
-			//fclose(fp);
 
 			SendTo(fromPeer->ID,new cUDPpacket(0,0,packet->Data,TYPE_CONFIRM,sizeof(UINT4),true));
 			fromPeer->PendingID++; //on va lui dire quon attend maintenant apres le packet 2

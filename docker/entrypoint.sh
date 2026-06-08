@@ -1,12 +1,20 @@
 #!/bin/sh
 set -e
 
+# Resolve the public IP to announce to the master server.
+# Inside Docker the detected interface IP is the container's internal 172.x address,
+# which is unreachable by game clients. SV_IP overrides it with the real host IP.
+if [ -z "${SV_IP:-}" ]; then
+    SV_IP=$(curl -sf --max-time 5 https://api.ipify.org || true)
+fi
+export SV_IP
+
 # --- Server identity ---
 GAME_MODE="${GAME_MODE:-FFA}"
 SERVER_NAME="${SERVER_NAME:-BaboViolent 2 Server}"
 MAX_PLAYERS="${MAX_PLAYERS:-16}"
 MAX_PLAYERS_IN_GAME="${MAX_PLAYERS_IN_GAME:-0}"
-PORT="${PORT:-3333}"
+PORT="${PORT:-3334}"
 PASSWORD="${PASSWORD:-}"
 GAME_PUBLIC="${GAME_PUBLIC:-false}"
 ADMIN_USER="${ADMIN_USER:-}"

@@ -4,6 +4,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libsdl2-mixer-2.0-0 \
         libglu1-mesa \
         libgl1 \
+        curl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY build-linux/BaboViolentDedicated /app/BaboViolentDedicated
@@ -13,7 +14,7 @@ RUN chmod +x /app/entrypoint.sh
 
 WORKDIR /app/Content
 
-EXPOSE 3333/tcp
-EXPOSE 3333/udp
+EXPOSE 3334/tcp
+EXPOSE 3334/udp
 
 ENTRYPOINT ["/app/entrypoint.sh"]
