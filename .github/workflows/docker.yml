@@ -2,7 +2,7 @@ name: Docker
 
 on:
   push:
-    branches: [modern, main]
+    branches: [modern, main, experimental]
   release:
     types: [published]
 
@@ -42,6 +42,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable=${{ github.event_name == 'release' }}
             type=raw,value=edge,enable=${{ github.ref == 'refs/heads/modern' || github.ref == 'refs/heads/main' }}
+            type=raw,value=experimental,enable=${{ github.ref == 'refs/heads/experimental' }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
