@@ -289,7 +289,7 @@ Pass a game mode as the first argument for a different mode:
   BaboViolentDedicated.exe CTF
   BaboViolentDedicated.exe TDM
 
-Game content is in the Content/ folder next to the .exe.
+Game data (main/, LaunchScript/, etc.) is in the same folder as the .exe.
 EOF
 		else
 			cat >"$d/README.txt" <<EOF
@@ -301,13 +301,11 @@ HOST:   Double-click BaboViolentDedicated.exe  (starts FFA by default)
           BaboViolentDedicated.exe CTF
           BaboViolentDedicated.exe TDM
 
-Game content is in the Content/ folder next to the .exe files.
-
-This package includes a default Content/bv2.db with:
+This package includes a default bv2.db with:
   - Master host babo.soh.re
   - Launcher profile default name "Unamed Babo"
 
-To use a local master, edit Content/bv2.db MasterServers to your host.
+To use a local master, edit bv2.db MasterServers to your host.
 EOF
 		fi
 	else
@@ -481,13 +479,19 @@ stage_combined_game() {
 	local d="$1"
 	local server_only="${2:-0}"
 
-	cp -a "$ROOT/Content" "$d/Content"
-	write_default_game_bv2_db "$d/Content"
-	set_default_player_name_cfg "$d/Content"
+	if [[ "$BV2_PLATFORM" == windows ]]; then
+		# Flat layout for Windows: strip Content/ wrapper so main/ sits next to
+		# the exe, matching the output of scripts/package-windows.ps1.
+		cp -a "$ROOT/Content/." "$d/"
+		local content_dir="$d"
+	else
+		cp -a "$ROOT/Content" "$d/Content"
+		local content_dir="$d/Content"
+	fi
+	write_default_game_bv2_db "$content_dir"
+	set_default_player_name_cfg "$content_dir"
 
 	if [[ "$BV2_PLATFORM" == windows ]]; then
-		# Flat layout: exe(s) and DLLs at the same level as Content/.
-		# No wrapper .bat — the exe finds Content/ on its own.
 		cp -a "$DED_BIN" "$d/$(exe_name BaboViolentDedicated)"
 		collect_libs "$d" "$d/$(exe_name BaboViolentDedicated)"
 		if [[ "$server_only" != 1 ]] && bin_exists "$CLI_BIN"; then
