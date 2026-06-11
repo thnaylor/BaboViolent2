@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.1.0](https://github.com/thnaylor/BaboViolent2/compare/v4.0.1...v4.1.0) (2026-06-11)
+
+
+### Features
+
+* **docker:** multi-stage build, rename GAMETYPE_LIST to GAMETYPE_ROTATION ([4884adc](https://github.com/thnaylor/BaboViolent2/commit/4884adcd3677412e0308ba3578c9c9eef457063f))
+* **server:** add sv_gametypeList gametype rotation ([6be16a2](https://github.com/thnaylor/BaboViolent2/commit/6be16a25a8565063d4271a891d2cff2bb2750541))
+
 ## [4.0.1](https://github.com/thnaylor/BaboViolent2/compare/v4.0.0...v4.0.1) (2026-06-08)
 
 
