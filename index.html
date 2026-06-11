@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BaboViolent 2 — Pure. Fast. Violent.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -22,9 +25,14 @@
       </div>
       <p class="tagline">PURE. FAST. VIOLENT.</p>
       <p class="sub-tagline">THE ARENA IS YOURS.</p>
-      <a href="https://github.com/thnaylor/BaboViolent2/releases" class="btn-download">
-        JOIN THE CHAOS &mdash; DOWNLOAD NOW
-      </a>
+      <div class="hero-btns">
+        <a href="https://github.com/thnaylor/BaboViolent2/releases/download/v4.0.1/BaboViolent2-windows-x86_64.zip" class="btn-download">
+          DOWNLOAD &mdash; WINDOWS
+        </a>
+        <a href="https://github.com/thnaylor/BaboViolent2/releases/download/v4.0.1/BaboViolent2-linux-x86_64.zip" class="btn-download btn-download--linux">
+          DOWNLOAD &mdash; LINUX
+        </a>
+      </div>
     </div>
   </header>
 
@@ -52,10 +60,6 @@
           <div class="feature-icon">&#127760;</div>
           <span>ONLINE MULTIPLAYER</span>
         </div>
-        <div class="feature-item">
-          <div class="feature-icon">&#127942;</div>
-          <span>RANKINGS &amp; LEADERBOARDS</span>
-        </div>
       </div>
     </div>
   </section>
@@ -75,9 +79,9 @@
 
         <div class="weapon-card">
           <div class="weapon-img-wrap">
-            <img src="images/weapons/minigun.png" alt="Minigun" onerror="this.parentElement.classList.add('no-img')" />
+            <img src="images/weapons/minigun.png" alt="Sub Machine Gun" onerror="this.parentElement.classList.add('no-img')" />
           </div>
-          <h3>MINIGUN</h3>
+          <h3>SUB MACHINE GUN</h3>
           <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:55%"></div></div></div>
           <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:40%"></div></div></div>
           <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:95%"></div></div></div>
@@ -85,9 +89,49 @@
 
         <div class="weapon-card">
           <div class="weapon-img-wrap">
-            <img src="images/weapons/rocket.png" alt="Rocket Launcher" onerror="this.parentElement.classList.add('no-img')" />
+            <img src="images/weapons/shotgun.png" alt="Shotgun" onerror="this.parentElement.classList.add('no-img')" />
           </div>
-          <h3>ROCKET LAUNCHER</h3>
+          <h3>SHOTGUN</h3>
+          <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:75%"></div></div></div>
+          <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:35%"></div></div></div>
+          <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:30%"></div></div></div>
+        </div>
+
+        <div class="weapon-card">
+          <div class="weapon-img-wrap">
+            <img src="images/weapons/sniper.png" alt="Sniper Rifle" onerror="this.parentElement.classList.add('no-img')" />
+          </div>
+          <h3>SNIPER RIFLE</h3>
+          <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:85%"></div></div></div>
+          <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:100%"></div></div></div>
+          <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:15%"></div></div></div>
+        </div>
+
+        <div class="weapon-card">
+          <div class="weapon-img-wrap">
+            <img src="images/weapons/minigun.png" alt="Dual Machine Gun" onerror="this.parentElement.classList.add('no-img')" />
+          </div>
+          <h3>DUAL MACHINE GUN</h3>
+          <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:55%"></div></div></div>
+          <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:40%"></div></div></div>
+          <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:95%"></div></div></div>
+        </div>
+
+        <div class="weapon-card">
+          <div class="weapon-img-wrap">
+            <img src="images/weapons/chaingun.png" alt="Chain Gun" onerror="this.parentElement.classList.add('no-img')" />
+          </div>
+          <h3>CHAIN GUN</h3>
+          <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:55%"></div></div></div>
+          <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:40%"></div></div></div>
+          <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:95%"></div></div></div>
+        </div>
+
+        <div class="weapon-card">
+          <div class="weapon-img-wrap">
+            <img src="images/weapons/rocket.png" alt="Bazooka" onerror="this.parentElement.classList.add('no-img')" />
+          </div>
+          <h3>BAZOOKA</h3>
           <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:90%"></div></div></div>
           <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:70%"></div></div></div>
           <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:20%"></div></div></div>
@@ -95,9 +139,9 @@
 
         <div class="weapon-card">
           <div class="weapon-img-wrap">
-            <img src="images/weapons/plasma.png" alt="Plasma Rifle" onerror="this.parentElement.classList.add('no-img')" />
+            <img src="images/weapons/plasma.png" alt="Photon Rifle" onerror="this.parentElement.classList.add('no-img')" />
           </div>
-          <h3>PLASMA RIFLE</h3>
+          <h3>PHOTON RIFLE</h3>
           <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:70%"></div></div></div>
           <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:80%"></div></div></div>
           <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:60%"></div></div></div>
@@ -113,50 +157,26 @@
           <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:85%"></div></div></div>
         </div>
 
-        <div class="weapon-card">
-          <div class="weapon-img-wrap">
-            <img src="images/weapons/sniper.png" alt="Sniper Rifle" onerror="this.parentElement.classList.add('no-img')" />
-          </div>
-          <h3>SNIPER RIFLE</h3>
-          <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:85%"></div></div></div>
-          <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:100%"></div></div></div>
-          <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:15%"></div></div></div>
-        </div>
-
-        <div class="weapon-card">
-          <div class="weapon-img-wrap">
-            <img src="images/weapons/shotgun.png" alt="Shotgun" onerror="this.parentElement.classList.add('no-img')" />
-          </div>
-          <h3>SHOTGUN</h3>
-          <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:75%"></div></div></div>
-          <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:35%"></div></div></div>
-          <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:30%"></div></div></div>
-        </div>
-
       </div>
     </div>
   </section>
 
-  <!-- STATS -->
-  <section class="stats">
+  <!-- HOST A SERVER -->
+  <section class="hosting">
     <div class="container">
-      <h2 class="section-title">ARENA <span class="red">STATS</span></h2>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-num" id="stat-players">2,847</div>
-          <div class="stat-label">PLAYERS ONLINE</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">128</div>
-          <div class="stat-label">ACTIVE SERVERS</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">18,432,190</div>
-          <div class="stat-label">TOTAL FRAGS</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">564</div>
-          <div class="stat-label">MAPS AVAILABLE</div>
+      <h2 class="section-title">HOST A <span class="red">SERVER</span></h2>
+      <div class="hosting-inner">
+        <div class="hosting-text">
+          <p>Run your own BaboViolent 2 dedicated server in minutes using Docker. Configure game modes, weapon settings, map rotations, and more.</p>
+          <ul class="hosting-features">
+            <li>One-line Docker setup</li>
+            <li>Full server configuration via env vars</li>
+            <li>Gametype &amp; map rotation support</li>
+            <li>Linux &amp; Windows Server compatible</li>
+          </ul>
+          <a href="https://github.com/thnaylor/baboviolent2-server-docker" class="btn-download" target="_blank" rel="noopener">
+            VIEW SERVER SETUP &rarr;
+          </a>
         </div>
       </div>
     </div>
@@ -167,19 +187,21 @@
     <div class="container">
       <h2>FREE TO PLAY</h2>
       <p>Open source. No cost. Pure chaos.</p>
-      <a href="https://github.com/thnaylor/BaboViolent2/releases" class="btn-download">
-        DOWNLOAD NOW
-      </a>
-      <a href="https://github.com/thnaylor/BaboViolent2" class="btn-secondary">
-        VIEW ON GITHUB
-      </a>
+      <div class="cta-btns">
+        <a href="https://github.com/thnaylor/BaboViolent2/releases/download/v4.0.1/BaboViolent2-windows-x86_64.zip" class="btn-download">
+          WINDOWS
+        </a>
+        <a href="https://github.com/thnaylor/BaboViolent2/releases/download/v4.0.1/BaboViolent2-linux-x86_64.zip" class="btn-download btn-download--linux">
+          LINUX
+        </a>
+      </div>
     </div>
   </section>
 
   <footer>
     <div class="container">
       <p>BaboViolent 2 &mdash; Open Source &mdash;
-        <a href="https://github.com/thnaylor/BaboViolent2">github.com/thnaylor/BaboViolent2</a>
+        <a href="https://github.com/thnaylor/BaboViolent2">View on GitHub</a>
       </p>
     </div>
   </footer>

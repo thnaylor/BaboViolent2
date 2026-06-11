@@ -9,8 +9,8 @@
   --dark3:   #1c1c1c;
   --grey:    #888;
   --light:   #e8e8e8;
-  --font-main: 'Impact', 'Arial Black', sans-serif;
-  --font-body: 'Arial', sans-serif;
+  --font-main: 'Bebas Neue', 'Impact', sans-serif;
+  --font-body: 'Barlow', 'Arial', sans-serif;
 }
 
 html { scroll-behavior: smooth; }
@@ -19,6 +19,7 @@ body {
   background: var(--dark);
   color: var(--light);
   font-family: var(--font-body);
+  font-size: 16px;
   overflow-x: hidden;
 }
 
@@ -129,49 +130,80 @@ a { color: inherit; text-decoration: none; }
   transform: translateY(-2px);
 }
 
+.btn-download--linux {
+  background: #1a1a1a;
+  border: 2px solid var(--red);
+  color: var(--light);
+}
+
+.btn-download--linux:hover {
+  background: #2a0a0a;
+}
+
+.hero-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.cta-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.cta-btns .btn-download {
+  min-width: 160px;
+  text-align: center;
+}
+
 /* ── Features ── */
 .features {
   background: var(--dark2);
-  border-top: 2px solid #2a0000;
-  border-bottom: 2px solid #2a0000;
-  padding: 36px 0;
+  border-top: 3px solid var(--red);
+  border-bottom: 3px solid var(--red);
+  padding: 56px 0;
 }
 
 .feature-grid {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .feature-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 20px 28px;
-  min-width: 140px;
-  border: 1px solid #2a2a2a;
+  gap: 14px;
+  padding: 32px 36px;
+  min-width: 160px;
+  border: 1px solid #333;
+  border-top: 3px solid transparent;
   background: var(--dark3);
-  transition: border-color .2s, background .2s;
+  transition: border-color .2s, background .2s, transform .15s;
   cursor: default;
 }
 
 .feature-item:hover {
-  border-color: var(--red);
-  background: #1f0a0a;
+  border-color: #333;
+  border-top-color: var(--red);
+  background: #1a0a0a;
+  transform: translateY(-4px);
 }
 
 .feature-icon {
-  font-size: 32px;
-  filter: drop-shadow(0 0 6px var(--red));
+  font-size: 44px;
+  filter: drop-shadow(0 0 10px var(--red));
 }
 
 .feature-item span {
   font-family: var(--font-main);
-  font-size: 11px;
+  font-size: 14px;
   letter-spacing: 2px;
-  color: #bbb;
+  color: #ddd;
   text-align: center;
 }
 
@@ -287,40 +319,69 @@ a { color: inherit; text-decoration: none; }
   border-radius: 2px;
 }
 
-/* ── Stats ── */
-.stats {
-  background: var(--dark);
+/* ── Hosting ── */
+.hosting {
+  background: var(--dark2);
   padding: 64px 0;
   border-top: 2px solid #2a0000;
 }
 
-.stats-grid {
+.hosting-inner {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
 }
 
-.stat-card {
-  background: var(--dark3);
-  border: 1px solid #2a2a2a;
-  padding: 28px 20px;
-  text-align: center;
-  border-top: 3px solid var(--red);
+.hosting-text p {
+  color: #aaa;
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 24px;
 }
 
-.stat-num {
-  font-family: var(--font-main);
-  font-size: clamp(28px, 4vw, 40px);
+.hosting-features {
+  list-style: none;
+  margin-bottom: 32px;
+}
+
+.hosting-features li {
+  padding: 8px 0;
+  border-bottom: 1px solid #222;
+  color: #ccc;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.hosting-features li::before {
+  content: '▸ ';
   color: var(--red);
-  letter-spacing: 2px;
-  margin-bottom: 8px;
 }
 
-.stat-label {
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: var(--grey);
-  text-transform: uppercase;
+.hosting-code {
+  background: #080808;
+  border: 1px solid #2a2a2a;
+  border-left: 3px solid var(--red);
+  padding: 28px;
+  overflow-x: auto;
+}
+
+.hosting-code pre {
+  margin: 0;
+}
+
+.hosting-code code {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  color: #c8c8c8;
+  line-height: 1.8;
+  white-space: pre;
+}
+
+@media (max-width: 768px) {
+  .hosting-inner {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ── CTA ── */
@@ -343,6 +404,11 @@ a { color: inherit; text-decoration: none; }
   font-size: 15px;
   margin-bottom: 32px;
   letter-spacing: 2px;
+}
+
+.cta .btn-secondary {
+  display: block;
+  margin-top: 20px;
 }
 
 .btn-secondary {
