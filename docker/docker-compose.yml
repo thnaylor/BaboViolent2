@@ -2,8 +2,8 @@ services:
   baboviolent2:
     image: ghcr.io/thnaylor/baboviolent2:edge
     ports:
-      - "3334:3334/tcp"
-      - "3334:3334/udp"
+      - "3334:3333/tcp"
+      - "3334:3333/udp"
     environment:
       # Public IP announced to the master server.
       # Inside Docker the server detects its internal 172.x container IP, which
@@ -13,6 +13,7 @@ services:
 
       # Server identity
       GAME_MODE: FFA              # FFA | CTF | TDM | Champion
+      GAMETYPE_ROTATION: "0 1 2"  # space-separated gametype IDs: 0=FFA 1=TDM 2=CTF 3=Champion; omit to use GAME_MODE only
       SERVER_NAME: "BaboViolent 2 Server"
       MAX_PLAYERS: 32
       MAX_PLAYERS_IN_GAME: 0      # 0 = no spectator limit; set equal to MAX_PLAYERS to disable spectating

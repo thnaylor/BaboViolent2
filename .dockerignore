@@ -1,0 +1,4 @@
+build-windows/
+build-linux/
+dist/
+.git/
