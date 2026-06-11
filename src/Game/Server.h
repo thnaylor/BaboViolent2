@@ -84,6 +84,9 @@ public:
 	// La liste des maps � jouer
 	std::vector<CString> mapList;
 
+	// Current position in the sv_gametypeList rotation
+	int gametypeIndex;
+
 	//A list of all maps + their sizes;
 	std::vector<mapInfo> mapInfoList;
 

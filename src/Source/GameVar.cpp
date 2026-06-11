@@ -390,6 +390,9 @@ GameVar::GameVar()
 		&sv_gameType, 0, 3, LIMIT_MIN | LIMIT_MAX, true);
 #endif
 
+	sv_gametypeList = "";
+	dksvarRegister(CString("sv_gametypeList [string : space-separated gametype rotation, e.g. \"0 1 2\"]"), &sv_gametypeList, true);
+
 	sv_bombTime = 60;
 	dksvarRegister(CString("sv_bombTime [int : (default 60)]"), &sv_bombTime, 10, 0, LIMIT_MIN, true);
 	sv_gameName = "Babo Violent 2 - Server";

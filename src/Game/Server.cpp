@@ -49,6 +49,7 @@ Server::Server(Game * pGame): maxTimeOverMaxPing(5.0f)//, maxIdleTime(180.0f)
 	needToShutDown = false;
 	pingDelay = 0;
 	changeMapDelay = 0;
+	gametypeIndex = 0;
 	frameID = 0;
 	autoBalanceTimer = 0;
 	infoSendDelay = 15;
@@ -667,6 +668,26 @@ void Server::update(float delay)
 			if (changeMapDelay <= 0)
 			{
 				changeMapDelay = 0;
+				{
+					// Parse sv_gametypeList fresh here; it is set by the launch script
+					// after host() runs, so parsing must be deferred to map-change time.
+					std::vector<int> rotation;
+					CString listCopy = gameVar.sv_gametypeList;
+					CString token = listCopy.getFirstToken(' ');
+					while (!token.isNull())
+					{
+						int gt = token.toInt();
+						if (gt >= 0 && gt <= 3)
+							rotation.push_back(gt);
+						token = listCopy.getFirstToken(' ');
+					}
+					if (!rotation.empty())
+					{
+						gameVar.sv_gameType = rotation[gametypeIndex % (int)rotation.size()];
+						gametypeIndex++;
+						console->add(CString("\x9> Gametype rotation -> %i", gameVar.sv_gameType), true);
+					}
+				}
 				game->resetGameType(gameVar.sv_gameType);
 				// On load la new map
 				CString lastMap = game->mapName;

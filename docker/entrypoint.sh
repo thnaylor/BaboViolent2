@@ -20,6 +20,9 @@ GAME_PUBLIC="${GAME_PUBLIC:-false}"
 ADMIN_USER="${ADMIN_USER:-}"
 ADMIN_PASS="${ADMIN_PASS:-}"
 
+# --- Gametype rotation ---
+GAMETYPE_LIST="${GAMETYPE_LIST:-}"
+
 # --- Gameplay ---
 FRIENDLY_FIRE="${FRIENDLY_FIRE:-false}"
 REFLECTED_DAMAGE="${REFLECTED_DAMAGE:-false}"
@@ -174,5 +177,10 @@ sed -i "s|sv_photonDistMult .*|sv_photonDistMult ${PHOTON_DIST_MULT}|"          
 sed -i "s|sv_photonVerticalShift .*|sv_photonVerticalShift ${PHOTON_VERTICAL_SHIFT}|"             "$BV2CFG"
 sed -i "s|sv_photonHorizontalShift .*|sv_photonHorizontalShift ${PHOTON_HORIZONTAL_SHIFT}|"       "$BV2CFG"
 sed -i "s|sv_photonType .*|sv_photonType ${PHOTON_TYPE}|"                                         "$BV2CFG"
+
+# Inject gametype rotation before endscript if set
+if [ -n "${GAMETYPE_LIST}" ]; then
+    sed -i "s|endscript|set sv_gametypeList \"${GAMETYPE_LIST}\"\nendscript|" "$SCRIPT"
+fi
 
 exec /app/BaboViolentDedicated server

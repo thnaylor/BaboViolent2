@@ -97,6 +97,7 @@ public:
 	int sv_scoreLimit;
 	int sv_winLimit;
 	int sv_gameType;
+	CString sv_gametypeList;
    int sv_serverType;
    int sv_spawnType;   
    int sv_subGameType;   
