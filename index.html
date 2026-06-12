@@ -14,15 +14,9 @@
   <!-- HERO -->
   <header class="hero">
     <div class="hero-overlay"></div>
-    <div class="hero-img-wrap">
-      <!-- Replace hero.png with the banner image -->
-      <img src="images/hero.png" alt="BaboViolent 2" class="hero-img" onerror="this.style.display='none'" />
-    </div>
+    <img src="images/babo_red.png" alt="" class="babo-red" />
     <div class="hero-content">
-      <div class="logo">
-        <span class="logo-babo">BABO</span>
-        <span class="logo-violent">VIOLENT<span class="logo-2">2</span></span>
-      </div>
+      <img src="images/logo.png" alt="BaboViolent 2" class="hero-logo" />
       <p class="tagline">PURE. FAST. VIOLENT.</p>
       <p class="sub-tagline">THE ARENA IS YOURS.</p>
       <div class="hero-btns">
@@ -34,30 +28,32 @@
         </a>
       </div>
     </div>
+    <img src="images/babo_blue.png" alt="" class="babo-blue" />
   </header>
 
   <!-- FEATURES -->
   <section class="features">
     <div class="container">
+      <h2 class="section-title">WHY <span class="red">BABOVIOLENT 2</span></h2>
       <div class="feature-grid">
         <div class="feature-item">
-          <div class="feature-icon">&#9760;</div>
+          <img src="images/features/deathmatch.png" alt="" class="feature-icon" />
           <span>DEATHMATCH</span>
         </div>
         <div class="feature-item">
-          <div class="feature-icon">&#9873;</div>
+          <img src="images/features/ctf.png" alt="" class="feature-icon" />
           <span>CAPTURE THE FLAG</span>
         </div>
         <div class="feature-item">
-          <div class="feature-icon">&#9888;</div>
+          <img src="images/features/powerful.png" alt="" class="feature-icon" />
           <span>POWERFUL WEAPONS</span>
         </div>
         <div class="feature-item">
-          <div class="feature-icon">&#9776;</div>
+          <img src="images/features/maps.png" alt="" class="feature-icon" />
           <span>CUSTOM MAPS</span>
         </div>
         <div class="feature-item">
-          <div class="feature-icon">&#127760;</div>
+          <img src="images/features/online.png" alt="" class="feature-icon" />
           <span>ONLINE MULTIPLAYER</span>
         </div>
       </div>
@@ -79,12 +75,22 @@
 
         <div class="weapon-card">
           <div class="weapon-img-wrap">
-            <img src="images/weapons/minigun.png" alt="Sub Machine Gun" onerror="this.parentElement.classList.add('no-img')" />
+            <img src="images/weapons/sub-machinegun.png" alt="Sub Machine Gun" onerror="this.parentElement.classList.add('no-img')" />
           </div>
           <h3>SUB MACHINE GUN</h3>
           <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:55%"></div></div></div>
           <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:40%"></div></div></div>
           <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:95%"></div></div></div>
+        </div>
+
+        <div class="weapon-card">
+          <div class="weapon-img-wrap">
+            <img src="images/weapons/dual-machinegun.png" alt="Dual Machine Gun" onerror="this.parentElement.classList.add('no-img')" />
+          </div>
+          <h3>DUAL MACHINE GUN</h3>
+          <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:60%"></div></div></div>
+          <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:40%"></div></div></div>
+          <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:90%"></div></div></div>
         </div>
 
         <div class="weapon-card">
@@ -99,7 +105,17 @@
 
         <div class="weapon-card">
           <div class="weapon-img-wrap">
-            <img src="images/weapons/sniper.png" alt="Sniper Rifle" onerror="this.parentElement.classList.add('no-img')" />
+            <img src="images/weapons/chaingun.png" alt="Chain Gun" onerror="this.parentElement.classList.add('no-img')" />
+          </div>
+          <h3>CHAIN GUN</h3>
+          <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:60%"></div></div></div>
+          <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:45%"></div></div></div>
+          <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:100%"></div></div></div>
+        </div>
+
+        <div class="weapon-card">
+          <div class="weapon-img-wrap">
+            <img src="images/weapons/sniper-rifle.png" alt="Sniper Rifle" onerror="this.parentElement.classList.add('no-img')" />
           </div>
           <h3>SNIPER RIFLE</h3>
           <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:85%"></div></div></div>
@@ -109,29 +125,9 @@
 
         <div class="weapon-card">
           <div class="weapon-img-wrap">
-            <img src="images/weapons/minigun.png" alt="Dual Machine Gun" onerror="this.parentElement.classList.add('no-img')" />
+            <img src="images/weapons/rocket-launcher.png" alt="Rocket Launcher" onerror="this.parentElement.classList.add('no-img')" />
           </div>
-          <h3>DUAL MACHINE GUN</h3>
-          <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:55%"></div></div></div>
-          <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:40%"></div></div></div>
-          <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:95%"></div></div></div>
-        </div>
-
-        <div class="weapon-card">
-          <div class="weapon-img-wrap">
-            <img src="images/weapons/chaingun.png" alt="Chain Gun" onerror="this.parentElement.classList.add('no-img')" />
-          </div>
-          <h3>CHAIN GUN</h3>
-          <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:55%"></div></div></div>
-          <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:40%"></div></div></div>
-          <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:95%"></div></div></div>
-        </div>
-
-        <div class="weapon-card">
-          <div class="weapon-img-wrap">
-            <img src="images/weapons/rocket.png" alt="Bazooka" onerror="this.parentElement.classList.add('no-img')" />
-          </div>
-          <h3>BAZOOKA</h3>
+          <h3>ROCKET LAUNCHER</h3>
           <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:90%"></div></div></div>
           <div class="stat-row"><span>RANGE</span><div class="bar"><div class="fill" style="width:70%"></div></div></div>
           <div class="stat-row"><span>FIRE RATE</span><div class="bar"><div class="fill" style="width:20%"></div></div></div>
@@ -139,7 +135,7 @@
 
         <div class="weapon-card">
           <div class="weapon-img-wrap">
-            <img src="images/weapons/plasma.png" alt="Photon Rifle" onerror="this.parentElement.classList.add('no-img')" />
+            <img src="images/weapons/photon-rifle.png" alt="Photon Rifle" onerror="this.parentElement.classList.add('no-img')" />
           </div>
           <h3>PHOTON RIFLE</h3>
           <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:70%"></div></div></div>
@@ -149,7 +145,7 @@
 
         <div class="weapon-card">
           <div class="weapon-img-wrap">
-            <img src="images/weapons/flamethrower.png" alt="Flamethrower" onerror="this.parentElement.classList.add('no-img')" />
+            <img src="images/weapons/framethrower-rifle.png" alt="Flamethrower" onerror="this.parentElement.classList.add('no-img')" />
           </div>
           <h3>FLAMETHROWER</h3>
           <div class="stat-row"><span>DAMAGE</span><div class="bar"><div class="fill" style="width:65%"></div></div></div>
@@ -178,6 +174,9 @@
             VIEW SERVER SETUP &rarr;
           </a>
         </div>
+        <div class="hosting-img-wrap">
+          <img src="images/host.png" alt="Host a server" class="hosting-img" />
+        </div>
       </div>
     </div>
   </section>
@@ -186,7 +185,7 @@
   <section class="cta">
     <div class="container">
       <h2>FREE TO PLAY</h2>
-      <p>Open source. No cost. Pure chaos.</p>
+      <p>Open source. Pure chaos.</p>
       <div class="cta-btns">
         <a href="https://github.com/thnaylor/BaboViolent2/releases/download/v4.0.1/BaboViolent2-windows-x86_64.zip" class="btn-download">
           WINDOWS
