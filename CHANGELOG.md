@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.3.0](https://github.com/thnaylor/BaboViolent2/compare/v4.2.0...v4.3.0) (2026-07-06)
+
+
+### Features
+
+* **master:** add babo.hostfrog.co.za as fallback master server ([7d8c5e0](https://github.com/thnaylor/BaboViolent2/commit/7d8c5e04a6e96f3d9faf6fd1b0f82fddd76d00b7))
+
 ## [4.2.0](https://github.com/thnaylor/BaboViolent2/compare/v4.1.0...v4.2.0) (2026-07-06)
 
 
