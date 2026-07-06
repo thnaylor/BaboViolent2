@@ -41,6 +41,8 @@ CMaster::CMaster()
 	m_nbGameFound = 0;
 	m_ping = 0;
 	RunningServer = 0;
+	m_masterIndex = 0;
+	m_browserRequestPending = false;
 
 	GetMasterInfos();
 
@@ -99,6 +101,27 @@ void CMaster::disconnectMaster()
 	uniqueClientID = 0;
 	m_isConnected = false;
 	ZEVEN_SAFE_DELETE(m_ping);
+}
+
+
+
+//
+//--- Advance to the next master server in the list; returns false when all have been tried.
+//
+bool CMaster::tryNextMaster()
+{
+	m_masterIndex++;
+	if (m_masterIndex >= (int)m_masterList.size())
+	{
+		m_masterIndex = 0;
+		return false;
+	}
+	strncpy(m_IP, m_masterList[m_masterIndex].ip, sizeof(m_IP) - 1);
+	m_IP[sizeof(m_IP) - 1] = '\0';
+	m_Port = m_masterList[m_masterIndex].port;
+	if (console)
+		console->add(CString("\x3> Master unreachable; trying fallback %s:%u", m_IP, (unsigned)m_Port));
+	return true;
 }
 
 
@@ -210,6 +233,20 @@ void CMaster::update(float in_delay)
 			uniqueClientID = 0;
 			m_isConnected = false;
 			ZEVEN_SAFE_DELETE(m_ping);
+
+			// If the game browser was waiting for results, try the next master.
+			if (m_browserRequestPending && tryNextMaster())
+			{
+				eraseGames();
+				m_nbGameFound = 0;
+				stBV2list bv2List;
+				strcpy(bv2List.Version, m_CurrentVersion);
+				sendPacket((char*)(&bv2List), sizeof(stBV2list), BV2_LIST);
+			}
+			else
+			{
+				m_browserRequestPending = false;
+			}
 		}
 		else if (result == 2)
 		{
@@ -730,6 +767,7 @@ void CMaster::recvPacket(const char * buffer, int typeID)
 			if (lobby) lobby->clearLobby();
 #endif
 			eraseGames();
+			m_browserRequestPending = false;
 			stMasterInfo masterInfo;
 			memcpy(&masterInfo, buffer, sizeof(stMasterInfo));
 			if (masterInfo.NbGames == 0)
@@ -915,6 +953,18 @@ void CMaster::sendGameInfo(Server* server)
 //
 void CMaster::requestGames()
 {
+	// Each fresh browse starts from the preferred (lowest-score) master.
+	// If we are currently disconnected we reset the index so the fallback
+	// chain always begins at [0]; if already connected, keep the session.
+	if (!uniqueClientID && !m_masterList.empty())
+	{
+		m_masterIndex = 0;
+		strncpy(m_IP, m_masterList[0].ip, sizeof(m_IP) - 1);
+		m_IP[sizeof(m_IP) - 1] = '\0';
+		m_Port = m_masterList[0].port;
+	}
+	m_browserRequestPending = true;
+
 	#ifndef DEDICATED_SERVER
 		//clear lobby
 		if( lobby ) lobby->clearLobby();
@@ -947,6 +997,8 @@ void CMaster::GetMasterInfos()
 	m_Port = 10207;
 	strncpy(m_CurrentVersion, BV2_RELEASE_STRING, sizeof(m_CurrentVersion) - 1);
 	m_CurrentVersion[sizeof(m_CurrentVersion) - 1] = '\0';
+	m_masterList.clear();
+	m_masterIndex = 0;
 
 	sqlite3 *db = 0;
 	if (sqlite3_open("bv2.db", &db) != SQLITE_OK)
@@ -955,6 +1007,11 @@ void CMaster::GetMasterInfos()
 			sqlite3_close(db);
 		if (console)
 			console->add("Game Database not found (bv2.db); using default master babo.soh.re:10207");
+		SMasterEntry def;
+		strncpy(def.ip, m_IP, sizeof(def.ip) - 1);
+		def.ip[sizeof(def.ip) - 1] = '\0';
+		def.port = m_Port;
+		m_masterList.push_back(def);
 		return;
 	}
 
@@ -964,33 +1021,26 @@ void CMaster::GetMasterInfos()
 	int nColumn = 0;
 	char SQL[256];
 
-	sprintf(SQL, "Select * From MasterServers;");
+	// Load all masters sorted by score so index 0 is always the preferred one.
+	sprintf(SQL, "Select * From MasterServers Order By Score Asc;");
 	int rc = sqlite3_get_table(db, SQL, &azResult, &nRow, &nColumn, &zErrMsg);
 	// sqlite3_get_table: names [0..nColumn-1], row i data at [nColumn + i*nColumn ..].
 	// MasterServers macros use i*nColumn+5..9 (valid when nColumn == 5, as in the launcher DB).
-	// MasterServers layout matches the launcher DB: 5 columns per row (macros use i*nColumn+5..9).
 	if (rc == SQLITE_OK && azResult != NULL && nRow >= 1 && nColumn == 5)
 	{
-		int i, best = 9999, bestIndex = 0;
-		for (i = 0; i < nRow; i++)
+		for (int i = 0; i < nRow; i++)
 		{
-			const char *scoreStr = azResult[MASTER_SCORE];
-			if (scoreStr && atoi(scoreStr) < best)
+			const char *ipStr = azResult[MASTER_IP];
+			const char *portStr = azResult[MASTER_PORT];
+			if (ipStr && portStr)
 			{
-				best = atoi(scoreStr);
-				bestIndex = i;
+				SMasterEntry entry;
+				strncpy(entry.ip, ipStr, sizeof(entry.ip) - 1);
+				entry.ip[sizeof(entry.ip) - 1] = '\0';
+				entry.port = (unsigned short)(atoi(portStr) - 1000);
+				m_masterList.push_back(entry);
 			}
 		}
-		i = bestIndex;
-		const char *ipStr = azResult[MASTER_IP];
-		const char *portStr = azResult[MASTER_PORT];
-		if (ipStr)
-		{
-			strncpy(m_IP, ipStr, sizeof(m_IP) - 1);
-			m_IP[sizeof(m_IP) - 1] = '\0';
-		}
-		if (portStr)
-			m_Port = (unsigned short)(atoi(portStr) - 1000);
 	}
 	if (zErrMsg)
 	{
@@ -999,6 +1049,19 @@ void CMaster::GetMasterInfos()
 	}
 	sqlite3_free_table(azResult);
 	azResult = 0;
+
+	if (m_masterList.empty())
+	{
+		SMasterEntry def;
+		strncpy(def.ip, m_IP, sizeof(def.ip) - 1);
+		def.ip[sizeof(def.ip) - 1] = '\0';
+		def.port = m_Port;
+		m_masterList.push_back(def);
+	}
+
+	strncpy(m_IP, m_masterList[0].ip, sizeof(m_IP) - 1);
+	m_IP[sizeof(m_IP) - 1] = '\0';
+	m_Port = m_masterList[0].port;
 
 	sprintf(SQL, "Select Value From LauncherSettings Where Name = 'Version';");
 	rc = sqlite3_get_table(db, SQL, &azResult, &nRow, &nColumn, &zErrMsg);

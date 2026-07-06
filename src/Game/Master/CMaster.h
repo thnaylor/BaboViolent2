@@ -29,6 +29,12 @@
 #define MASTER_LOCATION		i*nColumn+8
 #define MASTER_PORT			i*nColumn+9
 
+struct SMasterEntry
+{
+	char ip[64];
+	unsigned short port;
+};
+
 #include "sqlite3.h"
 
 #include "CPing.h"
@@ -139,6 +145,13 @@ private:
 	// holds the master server Port
 	unsigned short m_Port;
 
+	// ordered list of all master servers loaded from DB (sorted by Score asc)
+	std::vector<SMasterEntry> m_masterList;
+	int m_masterIndex;
+
+	// true while a BV2_LIST request is in-flight (enables fallback on TCP error)
+	bool m_browserRequestPending;
+
 	// keep peers here...some might be trying to login in remotely
 	std::vector<SPeer>	m_peers;
 
@@ -169,6 +182,9 @@ private:
 
 	// to get IP/port of current master server in the sqlite3 database
 	void GetMasterInfos();
+
+	// advance to next master in m_masterList; returns false if all exhausted
+	bool tryNextMaster();
 
 	void UpdateDB();
 
