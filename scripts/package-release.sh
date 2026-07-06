@@ -350,6 +350,7 @@ CREATE TABLE MasterServers (
   Port INTEGER
 );
 INSERT INTO MasterServers VALUES (0, 1, 'babo.soh.re', 'default', 11207);
+INSERT INTO MasterServers VALUES (1, 2, 'babo.hostfrog.co.za', 'default', 11207);
 
 CREATE TABLE LauncherSettings (
   Name TEXT,

@@ -105,7 +105,7 @@ There is **no interactive config file** in-tree for the master process; tuning i
 The client and dedicated code use **`CMaster::GetMasterInfos()`** (`src/Game/Master/CMaster.cpp`), which reads **`bv2.db`** in the **current working directory**:
 
 - Table **`MasterServers`** (when present and with the expected column layout) supplies master **hostname/IP** and a **port column** interpreted as **`listenPort + 1000`** in code (`m_Port = atoi(portStr) - 1000`).
-- If **`bv2.db`** is missing or the table does not match, defaults are **`babo.soh.re`** and TCP port **`10207`** (same as the in-repo `BaboMasterServer` listen port).
+- If **`bv2.db`** is missing or the table does not match, defaults are **`babo.soh.re`** and TCP port **`10207`** (same as the in-repo `BaboMasterServer` listen port). The release builds also include **`babo.hostfrog.co.za`** as a fallback master.
 
 **Local / self-hosted master:** insert or update **`MasterServers`** so `atoi(port) - 1000` equals your master’s listen port (e.g. for port **10207**, the stored port column should be **11207**). That overrides the public default for that install.
 
