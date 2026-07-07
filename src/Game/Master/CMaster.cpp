@@ -989,10 +989,29 @@ void CMaster::requestGames()
 //
 //--- Get Master Server IP / Port and our current game version from the database
 //
+// Built-in fallback list, used whenever bv2.db is missing or has no usable
+// MasterServers table (e.g. the dedicated-server Docker image, which never
+// bakes one in). Keep this in sync with the release-package db in
+// scripts/package-release.sh: hostfrog is the preferred master, soh.re the
+// fallback.
+static void PushDefaultMasterList(std::vector<SMasterEntry> &list)
+{
+	SMasterEntry entry;
+	strncpy(entry.ip, "babo.hostfrog.co.za", sizeof(entry.ip) - 1);
+	entry.ip[sizeof(entry.ip) - 1] = '\0';
+	entry.port = 10207;
+	list.push_back(entry);
+
+	strncpy(entry.ip, "babo.soh.re", sizeof(entry.ip) - 1);
+	entry.ip[sizeof(entry.ip) - 1] = '\0';
+	entry.port = 10207;
+	list.push_back(entry);
+}
+
 void CMaster::GetMasterInfos()
 {
 	// Defaults if DB is missing or tables differ (e.g. master-server bv2.db vs client launcher DB).
-	strncpy(m_IP, "babo.soh.re", sizeof(m_IP) - 1);
+	strncpy(m_IP, "babo.hostfrog.co.za", sizeof(m_IP) - 1);
 	m_IP[sizeof(m_IP) - 1] = '\0';
 	m_Port = 10207;
 	strncpy(m_CurrentVersion, BV2_RELEASE_STRING, sizeof(m_CurrentVersion) - 1);
@@ -1006,12 +1025,8 @@ void CMaster::GetMasterInfos()
 		if (db)
 			sqlite3_close(db);
 		if (console)
-			console->add("Game Database not found (bv2.db); using default master babo.soh.re:10207");
-		SMasterEntry def;
-		strncpy(def.ip, m_IP, sizeof(def.ip) - 1);
-		def.ip[sizeof(def.ip) - 1] = '\0';
-		def.port = m_Port;
-		m_masterList.push_back(def);
+			console->add("Game Database not found (bv2.db); using default masters babo.hostfrog.co.za, babo.soh.re");
+		PushDefaultMasterList(m_masterList);
 		return;
 	}
 
@@ -1052,11 +1067,7 @@ void CMaster::GetMasterInfos()
 
 	if (m_masterList.empty())
 	{
-		SMasterEntry def;
-		strncpy(def.ip, m_IP, sizeof(def.ip) - 1);
-		def.ip[sizeof(def.ip) - 1] = '\0';
-		def.port = m_Port;
-		m_masterList.push_back(def);
+		PushDefaultMasterList(m_masterList);
 	}
 
 	strncpy(m_IP, m_masterList[0].ip, sizeof(m_IP) - 1);
