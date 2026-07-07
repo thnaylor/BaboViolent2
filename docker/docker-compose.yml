@@ -1,5 +1,6 @@
 services:
   master:
+    image: ghcr.io/thnaylor/baboviolent2-master:edge
     build:
       context: ..
       dockerfile: docker/Dockerfile.master
