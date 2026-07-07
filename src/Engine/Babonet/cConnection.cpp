@@ -264,6 +264,13 @@ int cConnection::UpdateConnecting(float elapsed)
 					sprintf(LastError,"Error : connection update failed (#1).");
 					return 1;
 				}
+				// Cap blocking send/recv at 500 ms so the game loop never freezes
+				// when the remote peer stops responding.
+				{
+					DWORD tv = 500; // milliseconds
+					setsockopt(*FileDescriptor, SOL_SOCKET, SO_SNDTIMEO, (const char*)&tv, sizeof(tv));
+					setsockopt(*FileDescriptor, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv));
+				}
 			#else
 				INT4 arg;
 				if((arg = fcntl( *FileDescriptor, F_GETFL, NULL)) == -1 )
@@ -278,6 +285,14 @@ int cConnection::UpdateConnecting(float elapsed)
 					printf("fcntl for F_SETFL failed, errno = %i\n",errno);
 					sprintf(LastError,"Error : connection update failed (#3).");
 					return 1;
+				}
+				// Cap blocking send at 500 ms so the game loop never freezes.
+				{
+					struct timeval tv;
+					tv.tv_sec  = 0;
+					tv.tv_usec = 500000; // 500 ms
+					setsockopt(*FileDescriptor, SOL_SOCKET, SO_SNDTIMEO, (const char*)&tv, sizeof(tv));
+					setsockopt(*FileDescriptor, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv));
 				}
 			#endif
 			return 2; // connection succeded
@@ -349,8 +364,8 @@ int cConnection::Update(float elapsed)
 			{
 				ConTimeout += elapsed;
 
-				//10 seconds timeout reached ?
-				if(ConTimeout > 10.0f)
+				//3 seconds timeout reached ?
+				if(ConTimeout > 3.0f)
 				{
 					printf("ConnTimout Reached on socket %i!\n",*FileDescriptor);
 					//let's kill the socket
@@ -458,7 +473,7 @@ int cConnection::Update(float elapsed)
 			else if (ToRecv > 0)
 			{
 				ConTimeout += elapsed;
-				if (ConTimeout > 10.0f)
+				if (ConTimeout > 3.0f)
 				{
 					if (*FileDescriptor)
 						CloseSocket(*FileDescriptor);

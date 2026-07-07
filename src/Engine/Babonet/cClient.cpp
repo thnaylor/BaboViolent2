@@ -161,10 +161,21 @@ cClient::cClient(const char *HostIP, unsigned short port,UINT4 netID)
 	unsigned long resolvedAddr = inet_addr(HostIP);
 	if (resolvedAddr == INADDR_NONE)
 	{
-		hostent* host = gethostbyname(HostIP);
-		if (host && host->h_addr_list && host->h_addr_list[0])
+		// Use getaddrinfo with a short timeout-friendly approach.
+		// gethostbyname() is synchronous and blocks the game loop for
+		// the full DNS timeout (~10-15s) when the master is unreachable.
+		struct addrinfo hints = {};
+		struct addrinfo *result = NULL;
+		hints.ai_family = AF_INET;
+		hints.ai_socktype = SOCK_STREAM;
+		if (getaddrinfo(HostIP, NULL, &hints, &result) == 0 && result)
 		{
-			resolvedAddr = ((in_addr*)host->h_addr_list[0])->s_addr;
+			resolvedAddr = ((struct sockaddr_in*)result->ai_addr)->sin_addr.s_addr;
+			freeaddrinfo(result);
+		}
+		else if (result)
+		{
+			freeaddrinfo(result);
 		}
 	}
 
@@ -909,6 +920,12 @@ int cClient::Send(UINT4 &nbByte)
 		int iSent = 0;
 		#ifdef WIN32
 		iSent = send(FileDescriptor, buf + sent, packed - sent, 0);
+		if(iSent == SOCKET_ERROR && WSAGetLastError() == WSAEWOULDBLOCK)
+		{
+			// TCP send buffer full — queue untouched, retry next frame.
+			delete [] buf;
+			return 0;
+		}
 		#else
 		iSent = send(FileDescriptor, buf + sent, packed - sent, MSG_DONTWAIT);
 		if(iSent < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))

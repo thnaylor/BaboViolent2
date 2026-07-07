@@ -1,4 +1,14 @@
 services:
+  master:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.master
+    ports:
+      - "10207:10207/tcp"
+    volumes:
+      - master-data:/app
+    restart: unless-stopped
+
   baboviolent2:
     image: ghcr.io/thnaylor/baboviolent2:edge
     ports:
@@ -90,3 +100,6 @@ services:
       PHOTON_VERTICAL_SHIFT: 0.5
       PHOTON_HORIZONTAL_SHIFT: 2
       PHOTON_TYPE: 1
+
+volumes:
+  master-data:
