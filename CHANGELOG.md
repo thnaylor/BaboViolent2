@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.0](https://github.com/thnaylor/BaboViolent2/compare/v4.3.4...v4.4.0) (2026-07-07)
+
+
+### Features
+
+* **docker:** publish a prebuilt master server image to ghcr.io ([648c56c](https://github.com/thnaylor/BaboViolent2/commit/648c56ca32fced4ae018eb1db40b339869befdae))
+
 ## [4.3.4](https://github.com/thnaylor/BaboViolent2/compare/v4.3.3...v4.3.4) (2026-07-07)
 
 
