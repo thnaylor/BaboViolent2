@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.3.1](https://github.com/thnaylor/BaboViolent2/compare/v4.3.0...v4.3.1) (2026-07-07)
+
+
+### Bug Fixes
+
+* **net:** reduce master timeout, fix blocking send, add master Dockerfile ([1ce6b3f](https://github.com/thnaylor/BaboViolent2/commit/1ce6b3f83d4452f69fd09c566f05f71dfa5e1987))
+
 ## [4.3.0](https://github.com/thnaylor/BaboViolent2/compare/v4.2.0...v4.3.0) (2026-07-06)
 
 
