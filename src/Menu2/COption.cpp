@@ -102,13 +102,13 @@ COption::COption(CControl * in_parent, CControl * in_alignTo)
 		if (gameVar.r_widescreen == 2) lst_viewMode->selectChild(2);
 
 		//--- Screen resolution
-		label1 = new CControl(instance, CVector2i(20,10), CVector2i(200,220),"Screen resolution:", this, "LABEL", label1, CONTROL_SNAP_BOTTOM);
+		label1 = new CControl(instance, CVector2i(20,10), CVector2i(200,260),"Screen resolution:", this, "LABEL", label1, CONTROL_SNAP_BOTTOM);
 		label1->textAlign = CONTROL_TEXTALIGN_MIDDLERIGHT;
 		label1->toolTips = "(Need to reboot the game).";
 
 		if(gameVar.r_widescreen)
 		{
-			lst_resolution = new CControl(instance, CVector2i(10,10), CVector2i(300,220),"", this, "LISTBOX", label1, CONTROL_SNAP_RIGHT);
+			lst_resolution = new CControl(instance, CVector2i(10,10), CVector2i(300,260),"", this, "LISTBOX", label1, CONTROL_SNAP_RIGHT);
 			CControl * item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"Auto (detect)", this, "LABEL");
 			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"960 x 600",   this, "LABEL", item, CONTROL_SNAP_BOTTOM);
 			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"1280 x 720",  this, "LABEL", item, CONTROL_SNAP_BOTTOM);
@@ -132,7 +132,7 @@ COption::COption(CControl * in_parent, CControl * in_alignTo)
 		}
 		else
 		{
-			lst_resolution = new CControl(instance, CVector2i(10,10), CVector2i(300,220),"", this, "LISTBOX", label1, CONTROL_SNAP_RIGHT);
+			lst_resolution = new CControl(instance, CVector2i(10,10), CVector2i(300,260),"", this, "LISTBOX", label1, CONTROL_SNAP_RIGHT);
 			CControl * item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"Auto (detect)", this, "LABEL");
 			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"640 x 480",   this, "LABEL", item, CONTROL_SNAP_BOTTOM);
 			item = new CControl(lst_resolution, CVector2i(10,10), CVector2i(150,20),"800 x 600",   this, "LABEL", item, CONTROL_SNAP_BOTTOM);
