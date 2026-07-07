@@ -4,8 +4,28 @@ set -e
 # Resolve the public IP to announce to the master server.
 # Inside Docker the detected interface IP is the container's internal 172.x address,
 # which is unreachable by game clients. SV_IP overrides it with the real host IP.
+# Auto-detect tries several services with retries; a single flaky endpoint must
+# not leave us announcing a Docker-internal address.
+looks_like_ipv4() {
+    echo "$1" | grep -Eq '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'
+}
+
 if [ -z "${SV_IP:-}" ]; then
-    SV_IP=$(curl -sf --max-time 5 https://api.ipify.org || true)
+    for attempt in 1 2 3; do
+        for url in https://api.ipify.org https://checkip.amazonaws.com https://ifconfig.me/ip https://icanhazip.com; do
+            SV_IP=$(curl -sf --max-time 5 "$url" | tr -d '[:space:]' || true)
+            if looks_like_ipv4 "$SV_IP"; then
+                break 2
+            fi
+            SV_IP=""
+        done
+        sleep 2
+    done
+    if [ -n "$SV_IP" ]; then
+        echo "Auto-detected public IP: $SV_IP"
+    else
+        echo "WARNING: could not auto-detect public IP; set SV_IP explicitly or the server will announce its Docker-internal address." >&2
+    fi
 fi
 export SV_IP
 
