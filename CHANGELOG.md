@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.4.1](https://github.com/thnaylor/BaboViolent2/compare/v4.4.0...v4.4.1) (2026-07-07)
+
+
+### Bug Fixes
+
+* **docker:** drop build: section from master service, image-only ([901160e](https://github.com/thnaylor/BaboViolent2/commit/901160e34a6b73388e04a3ec54b41703f2e6acff))
+* **master:** honor SV_IP override on all platforms, not just Linux ([8e732df](https://github.com/thnaylor/BaboViolent2/commit/8e732df0a570389f5c9ce0e87e5b283c6ba51780))
+* **master:** restore public-peer auto-detection; harden container IP detect ([da72364](https://github.com/thnaylor/BaboViolent2/commit/da72364c7d9d0846839429ff8854771c8de1776f))
+
 ## [4.4.0](https://github.com/thnaylor/BaboViolent2/compare/v4.3.4...v4.4.0) (2026-07-07)
 
 
