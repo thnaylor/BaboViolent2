@@ -528,19 +528,22 @@ int cClient::ReceiveStream(int nbytes,char *buf)
 		if(WaitingForKey)
 		{
 			//key partial
-			if(nbytes-nread < KEY_SIZE)
+			if(nbytes-nread < bytesRemaining)
 			{
-				//partial key, lets take what we can
-				memcpy(lastKey,buf+nread,nbytes-nread);
+				//partial key, lets take what we can (append after what we already have)
+				memcpy(lastKey + (KEY_SIZE - bytesRemaining),buf+nread,nbytes-nread);
 
-				//let's check if what we partialy have is valid
-				int nb = nbytes-nread;
-				if(memcmp(lastKey, "RND1", nb > 4 ? 4 : nb ))
+				//let's check if what we partialy have is valid (only meaningful on the first fragment)
+				if(!PartialKey)
 				{
-					//rnd key is corrupted, potential hacking
-					Disconnect();
+					int nb = nbytes-nread;
+					if(memcmp(lastKey, "RND1", nb > 4 ? 4 : nb ))
+					{
+						//rnd key is corrupted, potential hacking
+						Disconnect();
+					}
 				}
-											
+
 				bytesRemaining -= nbytes-nread;
 				nread += nbytes-nread;
 				PartialKey = true;
@@ -596,10 +599,10 @@ int cClient::ReceiveStream(int nbytes,char *buf)
 		if(WaitingForHeader)
 		{
 			//on test si c un partial header ou complete
-			if(nbytes-nread < TCP_HEADER_SIZE)
+			if(nbytes-nread < bytesRemaining)
 			{
-				//header partiel
-				memcpy(&lastHeader[0],&buf[nread],nbytes-nread);
+				//header partiel (append after what we already have)
+				memcpy(&lastHeader[TCP_HEADER_SIZE - bytesRemaining],&buf[nread],nbytes-nread);
 				bytesRemaining -= nbytes-nread;
 				nread += nbytes-nread;
 				PartialHeader = true;
