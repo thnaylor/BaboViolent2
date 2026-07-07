@@ -923,7 +923,11 @@ void CMaster::sendGameInfo(Server* server)
 		strncpy(bv2Row.map, server->game->mapName.s, 16);
 		strncpy(bv2Row.serverName, gameVar.sv_gameName.s, 63);
 		strncpy(bv2Row.password, gameVar.sv_password.s, 15);
-		bv2Row.ip[0] = '\0';
+		// Self-report our IP (honors the SV_IP override) so the master can use
+		// it instead of the observed TCP peer address, which is a Docker-internal
+		// 172.x address when the dedicated server and master are both containers.
+		strncpy(bv2Row.ip, bb_getMyIP(), sizeof(bv2Row.ip) - 1);
+		bv2Row.ip[sizeof(bv2Row.ip) - 1] = '\0';
 		bv2Row.port = (unsigned short)gameVar.sv_port;
 		int nbPlayer = 0;
 		for (i=0;i<MAX_PLAYER;++i)

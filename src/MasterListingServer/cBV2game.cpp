@@ -22,8 +22,13 @@ cBV2game::cBV2game(char *ip,stBV2row & gameinfos, unsigned long baboID)
 	BaboID		=	baboID;
 
 	memcpy(&GameInfos,&gameinfos,sizeof(stBV2row));
-	
-	if(GameInfos.Priority == 0)
+
+	// Trust the server's self-reported IP (honors SV_IP behind Docker NAT) when
+	// it sent one; only fall back to the observed TCP peer address for older
+	// clients that leave it blank. The UDP ping/pong handshake verifies
+	// reachability independently, so a bogus self-reported IP just shows up
+	// unreachable rather than being trusted blindly.
+	if(GameInfos.Priority == 0 && GameInfos.ip[0] == '\0')
 	{
 		sprintf(GameInfos.ip,ip);
 	}
