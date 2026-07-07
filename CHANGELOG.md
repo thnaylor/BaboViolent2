@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.3.4](https://github.com/thnaylor/BaboViolent2/compare/v4.3.3...v4.3.4) (2026-07-07)
+
+
+### Bug Fixes
+
+* **master:** dedicated servers announce their real IP, not the Docker peer address ([12ec0e6](https://github.com/thnaylor/BaboViolent2/commit/12ec0e61fa1cbdd555b2e57b2943d47122c39b51))
+
 ## [4.3.3](https://github.com/thnaylor/BaboViolent2/compare/v4.3.2...v4.3.3) (2026-07-07)
 
 
