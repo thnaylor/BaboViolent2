@@ -153,11 +153,15 @@ INT4			dkcUpdateTimer()
 	// On update le timer
 	double elapsedd = (double)((CDkc::lastFrameCount) ? lGetTickCount - CDkc::lastFrameCount : 0) / (double)CDkc::frequency;
 	CDkc::lastFrameCount = lGetTickCount;
-	// Cap the single-step delta to one frame so a scheduler hiccup or blocking
-	// call can't cause the game loop to fire hundreds of catch-up frames and
-	// saturate the CPU for tens of seconds afterwards.
-	if (elapsedd > CDkc::perSeconde)
-		elapsedd = CDkc::perSeconde;
+	// Cap the single-step delta to a handful of ticks so a scheduler hiccup or
+	// blocking call can't cause the game loop to fire hundreds of catch-up
+	// frames and saturate the CPU for tens of seconds afterwards. Capping to
+	// exactly one tick (perSeconde) is too tight: a vsynced render loop calls
+	// this once per display refresh, and a tick rate above the refresh rate
+	// (e.g. 120Hz sim on a 60Hz display) legitimately needs 2+ ticks per call,
+	// which a one-tick cap would silently discard, halving game speed.
+	if (elapsedd > 4.0 * CDkc::perSeconde)
+		elapsedd = 4.0 * CDkc::perSeconde;
 	CDkc::elapsedf = (float)elapsedd;
 	CDkc::currentFrameDelay += CDkc::elapsedf;
 	INT4 nbFrameAdded=0;
