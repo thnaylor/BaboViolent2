@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.3.3](https://github.com/thnaylor/BaboViolent2/compare/v4.3.2...v4.3.3) (2026-07-07)
+
+
+### Bug Fixes
+
+* **master:** dedicated server now uses the hostfrog/soh.re fallback list ([ab15cb0](https://github.com/thnaylor/BaboViolent2/commit/ab15cb0e21e833811b11a78a472070a33a5f6131))
+
 ## [4.3.2](https://github.com/thnaylor/BaboViolent2/compare/v4.3.1...v4.3.2) (2026-07-07)
 
 
