@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.3.2](https://github.com/thnaylor/BaboViolent2/compare/v4.3.1...v4.3.2) (2026-07-07)
+
+
+### Bug Fixes
+
+* **net:** correctly reassemble TCP key/header split across multiple recv() calls ([340a66f](https://github.com/thnaylor/BaboViolent2/commit/340a66f266989b7567ac97e2d59164a5540055d9))
+* **perf:** stop the frame-delta cap from halving game speed ([db7659f](https://github.com/thnaylor/BaboViolent2/commit/db7659fd436ab9e82b054fd603aa48f5c9a7bac2))
+* **ui:** enlarge resolution list box so all entries fit ([d5fd613](https://github.com/thnaylor/BaboViolent2/commit/d5fd613e068591cfeff92258ef0e10fa04874577))
+
 ## [4.3.1](https://github.com/thnaylor/BaboViolent2/compare/v4.3.0...v4.3.1) (2026-07-07)
 
 
