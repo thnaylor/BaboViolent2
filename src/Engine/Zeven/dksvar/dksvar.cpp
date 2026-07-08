@@ -27,8 +27,9 @@
 #include <vld.h>
 #endif
 
-extern CSystemVariable systemVariable;
-
+// GetSystemVariable() is declared by CSystemVariable.h (already
+// included above), which also #defines systemVariable as an alias for
+// it -- no separate extern declaration needed here.
 
 //
 // Pour envoyer une commande console

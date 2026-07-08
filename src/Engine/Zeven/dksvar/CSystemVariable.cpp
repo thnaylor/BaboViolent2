@@ -24,8 +24,24 @@
 
 
 
-// Notre objet
-CSystemVariable systemVariable;
+// Construct-on-first-use, NOT a plain global. A plain
+// `CSystemVariable systemVariable;` put this at the mercy of C++'s
+// unspecified cross-translation-unit dynamic-initialization order:
+// under one observed toolchain, GameVar's global constructor (which
+// calls dksvarRegister for every setting) ran BEFORE this object's own
+// constructor. The registrations "succeeded" against the object's
+// zero-initialized (pre-construction) memory, since a zeroed vector is
+// bit-identical to an empty one -- then this object's real constructor
+// ran afterward and properly re-constructed `variables`, silently
+// wiping out every registration. Every setting (including the player
+// name) then saved as blank on every run. A function-local static is
+// guaranteed to be constructed on first use, regardless of
+// cross-TU ordering, which closes this off entirely.
+CSystemVariable& GetSystemVariable()
+{
+	static CSystemVariable instance;
+	return instance;
+}
 
 
 //

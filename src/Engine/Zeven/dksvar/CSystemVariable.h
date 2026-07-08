@@ -481,4 +481,11 @@ public:
 };
 
 
+// Construct-on-first-use accessor -- see the definition in
+// CSystemVariable.cpp for why this replaced a plain global object.
+// The macro preserves every existing `systemVariable.xxx` call site
+// unchanged (it textually expands to a call to the accessor).
+CSystemVariable& GetSystemVariable();
+#define systemVariable GetSystemVariable()
+
 #endif
