@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.2](https://github.com/thnaylor/BaboViolent2/compare/v4.5.1...v4.5.2) (2026-07-08)
+
+
+### Bug Fixes
+
+* **config:** stop player name and other string settings reverting on restart ([ee4214a](https://github.com/thnaylor/BaboViolent2/commit/ee4214a95d4a46bc45797882456e4f935122461b))
+
 ## [4.5.1](https://github.com/thnaylor/BaboViolent2/compare/v4.5.0...v4.5.1) (2026-07-08)
 
 
