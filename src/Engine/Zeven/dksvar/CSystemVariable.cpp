@@ -52,8 +52,22 @@ CSystemVariable::~CSystemVariable()
 
 bool CSVString::setValue(const CString & paramsT){
 	CString params = paramsT;
-	params.trim(' ');
-	params.trim('\"');
+	// A config file checked out/round-tripped with CRLF endings can leave a
+	// stray CR embedded between the real closing quote and one added by a
+	// previous corrupted save, e.g. text-quote-CR-quote. A single pass of
+	// trim(space) then trim(quote) can't reach that: each trim() only strips
+	// from the outer edge inward and stops at the first non-matching
+	// character, so whichever character isn't stripped first blocks the
+	// one behind it. Repeat until nothing more comes off either edge.
+	int lenBefore;
+	do
+	{
+		lenBefore = params.len();
+		params.trim('\r');
+		params.trim('\n');
+		params.trim(' ');
+		params.trim('\"');
+	} while (params.len() != lenBefore);
 
 	// On call la string interface, sinon on ne peut PAS modifier le string
 	if (systemVariable.stringInterface)
@@ -136,13 +150,12 @@ void CSystemVariable::loadConfigSVOnly(char * filename)
 				if (strnicmp(variable, "sv_", 3) == 0)
 				{
 					svType->loadConfig(ficIn);
-					break;
 				}
-				else
-				{
-					ficIn.ignore(512, '\n');
-					continue;
-				}
+				// else: not an sv_ var, leave it untouched -- the shared
+				// ficIn.ignore(512, newline) below flushes its line either way.
+				// (Previously ignore()'d here too, so the shared ignore()
+				// below consumed the FOLLOWING line's variable whole.)
+				break;
 			}
 		}
 

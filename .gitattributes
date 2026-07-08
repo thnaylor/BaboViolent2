@@ -1,6 +1,14 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
+# Runtime config files are parsed by a hand-rolled reader (CSystemVariable)
+# that historically choked on a CRLF-checked-out file: getline() captured
+# the trailing '\r' as data, which then blocked CSVString's own trim('"')
+# from stripping the real closing quote, embedding both into the stored
+# value permanently. Force LF so Windows checkouts (core.autocrlf=true)
+# can't reintroduce it, on top of the CSVString::setValue fix.
+Content/main/*.cfg text eol=lf
+
 # Custom for Visual Studio
 *.cs     diff=csharp
 *.sln    merge=union

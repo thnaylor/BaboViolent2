@@ -417,8 +417,12 @@ public:
 		variableName=screenName;value=defaultValue;configBypass=mConfigBypass;}
 	void loadConfig(ifstream & ficIn)
     {
+		// get(), not getline(): getline() consumes the trailing newline, but every
+		// other CSVType leaves it for CSystemVariable::loadConfig's shared
+		// ficIn.ignore(512, newline) to flush. Consuming it here made that ignore()
+		// eat the following line's variable whole on every load.
 		char tmp[256];
-		ficIn.getline(tmp, 256);
+		ficIn.get(tmp, 256);
         CString s(tmp);
 		setValue(s);
 	}
