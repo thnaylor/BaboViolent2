@@ -364,16 +364,6 @@ INSERT INTO LauncherSettings VALUES ('ProfileName', 'Unamed Babo');
 SQL
 }
 
-set_default_player_name_cfg() {
-	local content_dir="$1"
-	local cfg="$content_dir/main/bv2.cfg"
-	[[ -f "$cfg" ]] || return 0
-	# Existing line may include control chars from prior profiles; drop it and append a clean value.
-	awk '!/^cl_playerName /' "$cfg" >"$cfg.tmp"
-	echo 'cl_playerName "Unamed Babo"' >>"$cfg.tmp"
-	mv "$cfg.tmp" "$cfg"
-}
-
 write_run_master_unix() {
 	local d="$1"
 	cat >"$d/run.sh" <<'EOF'
@@ -490,7 +480,6 @@ stage_combined_game() {
 		local content_dir="$d/Content"
 	fi
 	write_default_game_bv2_db "$content_dir"
-	set_default_player_name_cfg "$content_dir"
 
 	if [[ "$BV2_PLATFORM" == windows ]]; then
 		cp -a "$DED_BIN" "$d/$(exe_name BaboViolentDedicated)"

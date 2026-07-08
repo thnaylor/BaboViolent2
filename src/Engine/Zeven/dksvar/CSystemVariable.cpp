@@ -112,6 +112,12 @@ void CSystemVariable::loadConfig(char * filename)
 	{
 		char variable[256];
 		ficIn >> variable;
+		// while(!eof()) checks BEFORE the read; a failed extraction at true EOF
+		// leaves `variable` holding the PREVIOUS iteration's value, causing one
+		// spurious extra pass that re-matches and overwrites whatever variable
+		// happened to be last in the file with empty/stale data. Bail out here
+		// instead of trusting eof() to have been set before this read ran.
+		if (!ficIn) break;
 		if ((variable[0] == '/') && (variable[1] == '/'))
 		{
 			ficIn.ignore(512, '\n');
@@ -150,6 +156,12 @@ void CSystemVariable::loadConfigSVOnly(char * filename)
 	{
 		char variable[256];
 		ficIn >> variable;
+		// while(!eof()) checks BEFORE the read; a failed extraction at true EOF
+		// leaves `variable` holding the PREVIOUS iteration's value, causing one
+		// spurious extra pass that re-matches and overwrites whatever variable
+		// happened to be last in the file with empty/stale data. Bail out here
+		// instead of trusting eof() to have been set before this read ran.
+		if (!ficIn) break;
 		if ((variable[0] == '/') && (variable[1] == '/'))
 		{
 			ficIn.ignore(512, '\n');
