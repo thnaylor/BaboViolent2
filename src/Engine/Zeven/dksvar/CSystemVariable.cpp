@@ -172,11 +172,16 @@ void CSystemVariable::loadConfigSVOnly(char * filename)
 //
 void CSystemVariable::saveConfig(char * filename)
 {
-	FILE * fic = fopen(filename, "wb");
-	if (!fic) return;
-	fclose(fic);
-
-	ofstream ficOut(filename, ios::in);
+	// Plain ios::out|ios::trunc unconditionally creates/truncates the file
+	// for writing regardless of prior state -- deterministic and portable.
+	// The previous fopen("wb") pre-create + ofstream(filename, ios::in) combo
+	// relied on ios::in|ios::out mapping to a pre-existing-file-only mode
+	// ("r+"), which is implementation-defined behavior: some standard library
+	// implementations require the file to already be openable for reading in
+	// that mode, which the truncate-to-empty step above can leave in a state
+	// that fails ficOut.fail() checks depending on the runtime/OS. Not
+	// reproduced locally against MinGW, but this form has no such ambiguity.
+	ofstream ficOut(filename, ios::out | ios::trunc);
 
 	if (ficOut.fail())
 	{

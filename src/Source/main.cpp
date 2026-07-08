@@ -69,6 +69,19 @@ static void bv2_relocate_to_content()
     char *sep = strrchr(exeDir, '\\');
     if (sep) *sep = '\0';
 
+    // Current release packaging (package-release.sh) ships a flat layout:
+    // main\ sits directly next to the exe, no Content\ wrapper. Try that
+    // first; fall back to the older nested Content\ layout for compatibility
+    // with any package built the previous way.
+    char flatMain[MAX_PATH];
+    snprintf(flatMain, MAX_PATH, "%s\\main", exeDir);
+    DWORD flatAttr = GetFileAttributesA(flatMain);
+    if (flatAttr != INVALID_FILE_ATTRIBUTES && (flatAttr & FILE_ATTRIBUTE_DIRECTORY))
+    {
+        SetCurrentDirectoryA(exeDir);
+        return;
+    }
+
     char content[MAX_PATH];
     snprintf(content, MAX_PATH, "%s\\Content", exeDir);
     DWORD attr = GetFileAttributesA(content);
