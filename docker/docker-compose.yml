@@ -1,10 +1,20 @@
 services:
   master:
     image: ghcr.io/thnaylor/baboviolent2-master:edge
+    # Deployment note: the master lists each game server by the source IP it
+    # observes on the server's TCP connection (when that address is public).
+    # Native Linux Docker preserves real source IPs on published ports, so a
+    # Linux host works like a bare-metal master. Docker Desktop (Windows/mac)
+    # proxies published ports and masks EVERY peer as the bridge gateway
+    # (172.x.0.1) — behind it, game servers are only listed correctly if they
+    # self-report a public IP (SV_IP or auto-detect). Prefer a Linux host.
     ports:
       - "10207:10207/tcp"
     volumes:
-      - master-data:/app
+      # Mount ONLY the data dir. Mounting a named volume over /app pins the
+      # container to whatever binary the volume captured on first use —
+      # image updates are silently ignored from then on.
+      - master-data:/app/data
     restart: unless-stopped
 
   baboviolent2:
@@ -16,7 +26,10 @@ services:
       # Public IP announced to the master server.
       # Inside Docker the server detects its internal 172.x container IP, which
       # is unreachable by clients. Set this to your host's real public IP.
-      # Leave blank to auto-detect on startup.
+      # Leave blank to auto-detect on startup (requires outbound HTTP/HTTPS).
+      # The dedicated logs "Announcing server IP ..." showing the value used;
+      # the master logs the listing decision per server ("New game ... listed
+      # as ..."), so both sides can be checked when an entry looks wrong.
       SV_IP: ""
 
       # Master server to register with. "master" is the bundled service above,

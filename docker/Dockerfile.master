@@ -28,12 +28,20 @@ COPY --from=builder /src/build-linux/BaboMasterServer /app/BaboMasterServer
 COPY packaging/master-bootstrap.sql /app/master-bootstrap.sql
 COPY packaging/web-bootstrap.sql /app/web-bootstrap.sql
 
-WORKDIR /app
+# Databases live in /app/data so a persistence volume can be mounted there
+# WITHOUT shadowing the binary: a named volume mounted over /app is populated
+# from the image once and then serves that stale copy forever, silently
+# pinning deployments to the first binary ever run. Never mount over /app.
+WORKDIR /app/data
 
 # Initialize databases if not already present (supports volume mounts).
+# Stray binaries are removed from the data dir in case an old volume that
+# was previously mounted at /app is remounted here.
 RUN printf '#!/bin/sh\nset -e\n\
-if [ ! -s /app/master.db ]; then sqlite3 /app/master.db < /app/master-bootstrap.sql; fi\n\
-if [ ! -s /app/web.db ]; then sqlite3 /app/web.db < /app/web-bootstrap.sql; fi\n\
+mkdir -p /app/data && cd /app/data\n\
+rm -f BaboMasterServer entrypoint.sh master-bootstrap.sql web-bootstrap.sql\n\
+if [ ! -s master.db ]; then sqlite3 master.db < /app/master-bootstrap.sql; fi\n\
+if [ ! -s web.db ]; then sqlite3 web.db < /app/web-bootstrap.sql; fi\n\
 exec /app/BaboMasterServer\n' > /app/entrypoint.sh \
     && chmod +x /app/entrypoint.sh
 
