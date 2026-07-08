@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.5.1](https://github.com/thnaylor/BaboViolent2/compare/v4.5.0...v4.5.1) (2026-07-08)
+
+
+### Bug Fixes
+
+* **docker:** mount master data volume at /app/data so image updates take effect ([3eb8079](https://github.com/thnaylor/BaboViolent2/commit/3eb80796b8effd998c20a97c638c7b24732304fd))
+* **master:** repair public-IP auto-detect and log IP listing decisions ([660821d](https://github.com/thnaylor/BaboViolent2/commit/660821d0cb29670390b26bff02743bdc9486956a))
+
 ## [4.5.0](https://github.com/thnaylor/BaboViolent2/compare/v4.4.1...v4.5.0) (2026-07-08)
 
 
