@@ -763,7 +763,7 @@ int cMasterServer::CreateGame(cBV2game* newGame)
 		//newGame->ID = ++LastBV2id;
 	}
 
-	//printf("CREATED Game with IP : %s port : %i\n",newGame->GameInfos.ip ,newGame->GameInfos.port);
+	newGame->LogListingDecision();
 	//*exist = false;
 
 	// add game to web db

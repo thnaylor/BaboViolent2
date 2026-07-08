@@ -11,8 +11,11 @@ looks_like_ipv4() {
 }
 
 if [ -z "${SV_IP:-}" ]; then
+    # HTTPS endpoints first; plain-HTTP fallbacks cover environments with a
+    # broken CA store or badly skewed clock where TLS verification fails.
     for attempt in 1 2 3; do
-        for url in https://api.ipify.org https://checkip.amazonaws.com https://ifconfig.me/ip https://icanhazip.com; do
+        for url in https://api.ipify.org https://checkip.amazonaws.com https://ifconfig.me/ip https://icanhazip.com \
+                   http://api.ipify.org http://checkip.amazonaws.com; do
             SV_IP=$(curl -sf --max-time 5 "$url" | tr -d '[:space:]' || true)
             if looks_like_ipv4 "$SV_IP"; then
                 break 2
@@ -22,10 +25,12 @@ if [ -z "${SV_IP:-}" ]; then
         sleep 2
     done
     if [ -n "$SV_IP" ]; then
-        echo "Auto-detected public IP: $SV_IP"
+        echo "Auto-detected public IP: $SV_IP (announced to the master; set SV_IP to override)"
     else
         echo "WARNING: could not auto-detect public IP; set SV_IP explicitly or the server will announce its Docker-internal address." >&2
     fi
+else
+    echo "Announcing public IP from SV_IP: $SV_IP"
 fi
 export SV_IP
 

@@ -21,6 +21,9 @@ cBV2game::cBV2game()
 	Next		=	0;
 	Previous	=	0;
 
+	PeerIP[0]	=	'\0';
+	SelfIP[0]	=	'\0';
+
 	LastCheck	=	0;
 	//ID			=	0;
 	//ServerID	=	0;
@@ -38,6 +41,9 @@ cBV2game::cBV2game(char *ip,stBV2row & gameinfos, unsigned long baboID)
 
 	memcpy(&GameInfos,&gameinfos,sizeof(stBV2row));
 
+	snprintf(PeerIP, sizeof(PeerIP), "%s", ip ? ip : "");
+	snprintf(SelfIP, sizeof(SelfIP), "%s", gameinfos.ip);
+
 	// The observed TCP peer address is authoritative whenever it's public:
 	// in the normal no-Docker case NAT rewrites the connection's source to
 	// the server's real public IP, which is exactly what players need. Only
@@ -53,6 +59,16 @@ cBV2game::cBV2game(char *ip,stBV2row & gameinfos, unsigned long baboID)
 			sprintf(GameInfos.ip,ip);
 		}
 	}
+}
+
+void cBV2game::LogListingDecision() const
+{
+	printf("New game '%.63s' listed as %s:%u (peer %s, self-reported '%s')\n",
+		GameInfos.serverName, GameInfos.ip, (unsigned)GameInfos.port, PeerIP, SelfIP);
+	if (GameInfos.ip[0] == '\0' || ipIsPrivate(GameInfos.ip))
+		printf("WARNING: listed IP '%s' is not publicly reachable; clients will fail to join this server. "
+			"Set SV_IP on the game server to its public IP, or run the master where it sees real peer "
+			"addresses (Docker Desktop and published-port proxies mask them).\n", GameInfos.ip);
 }
 
 int cBV2game::Update(float elapsed)

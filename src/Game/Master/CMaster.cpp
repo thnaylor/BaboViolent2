@@ -936,9 +936,21 @@ void CMaster::sendGameInfo(Server* server)
 		}
 		else
 		{
-			strncpy(bv2Row.ip, bb_getMyIP(), sizeof(bv2Row.ip) - 1);
+			const char *detectedIP = bb_getMyIP();
+			strncpy(bv2Row.ip, detectedIP ? detectedIP : "", sizeof(bv2Row.ip) - 1);
 		}
 		bv2Row.ip[sizeof(bv2Row.ip) - 1] = '\0';
+		// Log the announced IP so operators can see what the master will list
+		// (once at startup and again on any change, not every heartbeat).
+		static char lastAnnouncedIP[16] = {1, 0};
+		if (strncmp(lastAnnouncedIP, bv2Row.ip, sizeof(lastAnnouncedIP)) != 0)
+		{
+			strncpy(lastAnnouncedIP, bv2Row.ip, sizeof(lastAnnouncedIP) - 1);
+			lastAnnouncedIP[sizeof(lastAnnouncedIP) - 1] = '\0';
+			if (console)
+				console->add(CString("Announcing server IP '%s' to master%s", bv2Row.ip,
+					ipOverride && ipOverride[0] ? " (from SV_IP)" : " (auto-detected; set SV_IP to override)"));
+		}
 		bv2Row.port = (unsigned short)gameVar.sv_port;
 		int nbPlayer = 0;
 		for (i=0;i<MAX_PLAYER;++i)

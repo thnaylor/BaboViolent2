@@ -20,11 +20,14 @@ RUN cmake -S . -B build-linux \
 # ── Stage 2: runtime ─────────────────────────────────────────────────────────
 FROM ubuntu:24.04
 
+# ca-certificates is required for the entrypoint's HTTPS public-IP
+# auto-detect; --no-install-recommends skips it, so list it explicitly.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libsdl2-mixer-2.0-0 \
         libglu1-mesa \
         libgl1 \
         curl \
+        ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /src/build-linux/BaboViolentDedicated /app/BaboViolentDedicated

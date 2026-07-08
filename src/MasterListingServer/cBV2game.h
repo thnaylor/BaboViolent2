@@ -23,6 +23,11 @@ public:
 	//game infos
 	stBV2row	GameInfos;		//keep all game infos here
 
+	// Registration provenance, kept so CreateGame can log the listing
+	// decision once per new game instead of on every heartbeat.
+	char		PeerIP[16];		//TCP peer address as observed by the master
+	char		SelfIP[16];		//IP the server self-reported in its row
+
 	unsigned long	BaboID;
 
 	cBV2game	*Next;
@@ -31,6 +36,7 @@ public:
 	cBV2game();
 	cBV2game(char *ip,stBV2row & gameinfos, unsigned long baboID);
 
+	void	LogListingDecision() const;	//print peer/self -> listed IP; called once when a new game is inserted
 
 	int	Update(float elapsed);
 
