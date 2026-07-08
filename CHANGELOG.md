@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.3](https://github.com/thnaylor/BaboViolent2/compare/v4.5.2...v4.5.3) (2026-07-08)
+
+
+### Bug Fixes
+
+* **config:** trigger release for a184d69 ([d7dacf2](https://github.com/thnaylor/BaboViolent2/commit/d7dacf2766c321c7facfc927b32c8815ead802f1))
+
 ## [4.5.2](https://github.com/thnaylor/BaboViolent2/compare/v4.5.1...v4.5.2) (2026-07-08)
 
 
