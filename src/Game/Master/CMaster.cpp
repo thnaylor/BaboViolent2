@@ -1034,6 +1034,28 @@ void CMaster::GetMasterInfos()
 	m_masterList.clear();
 	m_masterIndex = 0;
 
+	// Explicit env override. A Docker/self-hosted dedicated server can be
+	// pointed straight at a master (e.g. MASTER_HOST=master, the compose
+	// service name) instead of dialing the public DNS name — which resolves
+	// to its own public IP and dies on routers without hairpin NAT when the
+	// master runs behind the same NAT.
+	const char *envHost = getenv("MASTER_HOST");
+	if (envHost && envHost[0])
+	{
+		const char *envPort = getenv("MASTER_PORT");
+		SMasterEntry entry;
+		strncpy(entry.ip, envHost, sizeof(entry.ip) - 1);
+		entry.ip[sizeof(entry.ip) - 1] = '\0';
+		entry.port = (unsigned short)((envPort && envPort[0]) ? atoi(envPort) : 10207);
+		m_masterList.push_back(entry);
+		strncpy(m_IP, entry.ip, sizeof(m_IP) - 1);
+		m_IP[sizeof(m_IP) - 1] = '\0';
+		m_Port = entry.port;
+		if (console)
+			console->add(CString("Master override from environment: %s:%u", m_IP, (unsigned)m_Port));
+		return;
+	}
+
 	sqlite3 *db = 0;
 	if (sqlite3_open("bv2.db", &db) != SQLITE_OK)
 	{

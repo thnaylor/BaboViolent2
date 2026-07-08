@@ -16,8 +16,16 @@ services:
       # Public IP announced to the master server.
       # Inside Docker the server detects its internal 172.x container IP, which
       # is unreachable by clients. Set this to your host's real public IP.
-      # Leave blank to auto-detect via api.ipify.org on startup.
+      # Leave blank to auto-detect on startup.
       SV_IP: ""
+
+      # Master server to register with. "master" is the bundled service above,
+      # reached over the Docker network — required when master and dedicated
+      # run behind the same NAT, where dialing the public DNS name would need
+      # hairpin NAT support on the router. Remove both to use the public
+      # default masters (babo.hostfrog.co.za, babo.soh.re).
+      MASTER_HOST: "master"
+      MASTER_PORT: 10207
 
       # Server identity
       GAME_MODE: FFA              # FFA | CTF | TDM | Champion
