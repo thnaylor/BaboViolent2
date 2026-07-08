@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.0](https://github.com/thnaylor/BaboViolent2/compare/v4.4.1...v4.5.0) (2026-07-08)
+
+
+### Features
+
+* **master:** MASTER_HOST/MASTER_PORT env override for self-hosted masters ([98a12ba](https://github.com/thnaylor/BaboViolent2/commit/98a12ba98ace8a9becfa73923008f173bdbd46df))
+
 ## [4.4.1](https://github.com/thnaylor/BaboViolent2/compare/v4.4.0...v4.4.1) (2026-07-07)
 
 
