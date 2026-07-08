@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.4](https://github.com/thnaylor/BaboViolent2/compare/v4.5.3...v4.5.4) (2026-07-08)
+
+
+### Bug Fixes
+
+* **config:** fix static-init-order bug that emptied bv2.cfg on MinGW builds ([9e8d269](https://github.com/thnaylor/BaboViolent2/commit/9e8d2696ac8c7f55493eabe04a02295d8ca8c9a2))
+
 ## [4.5.3](https://github.com/thnaylor/BaboViolent2/compare/v4.5.2...v4.5.3) (2026-07-08)
 
 
