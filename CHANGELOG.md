@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.5](https://github.com/thnaylor/BaboViolent2/compare/v4.5.4...v4.5.5) (2026-07-08)
+
+
+### Bug Fixes
+
+* **config:** fix eof-loop bug that blanked whatever setting was last in the file ([72bf36d](https://github.com/thnaylor/BaboViolent2/commit/72bf36dcfd5609409c397f4b72c169079b5379f4))
+
 ## [4.5.4](https://github.com/thnaylor/BaboViolent2/compare/v4.5.3...v4.5.4) (2026-07-08)
 
 
