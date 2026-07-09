@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.6](https://github.com/thnaylor/BaboViolent2/compare/v4.5.5...v4.5.6) (2026-07-09)
+
+
+### Bug Fixes
+
+* **scoreboard:** stop TDM/CTF scoreboard forcing player names to team color ([dbc3a80](https://github.com/thnaylor/BaboViolent2/commit/dbc3a80a0da9e2fb6d78393f712f4b68730ef957))
+
 ## [4.5.5](https://github.com/thnaylor/BaboViolent2/compare/v4.5.4...v4.5.5) (2026-07-08)
 
 
