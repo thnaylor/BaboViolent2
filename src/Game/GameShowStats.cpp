@@ -92,7 +92,7 @@ void Game::renderBlueTeam(std::vector<Player*> & blueTeam, int & vPos)
 	for (int j=0;j<(int)blueTeam.size();++j)
 	{
 		CString showName = blueTeam[j]->name;
-		showName.insert("\x1", 0);
+		showName.insert("\x8", 0);
 		if (blueTeam[j]->status == PLAYER_STATUS_DEAD) showName.insert(CString("(%s) ", gameVar.lang_dead.s).s, 0);
 
 		CString pingStr;
@@ -124,7 +124,7 @@ void Game::renderRedTeam(std::vector<Player*> & redTeam, int & vPos)
 	for (int j=0;j<(int)redTeam.size();++j)
 	{
 		CString showName = redTeam[j]->name;
-		showName.insert("\x4", 0);
+		showName.insert("\x8", 0);
 		if (redTeam[j]->status == PLAYER_STATUS_DEAD) showName.insert(CString("(%s) ", gameVar.lang_dead.s).s, 0);
 
 		CString pingStr;
