@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.7](https://github.com/thnaylor/BaboViolent2/compare/v4.5.6...v4.5.7) (2026-07-10)
+
+
+### Bug Fixes
+
+* **server:** reap connections stuck in PLAYER_STATUS_LOADING ([9d9cd73](https://github.com/thnaylor/BaboViolent2/commit/9d9cd7388055841aeda524b386d127018b4fbc3c))
+
 ## [4.5.6](https://github.com/thnaylor/BaboViolent2/compare/v4.5.5...v4.5.6) (2026-07-09)
 
 
