@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.6.0](https://github.com/thnaylor/BaboViolent2/compare/v4.5.8...v4.6.0) (2026-07-10)
+
+
+### Features
+
+* add Discord status bot ([086803a](https://github.com/thnaylor/BaboViolent2/commit/086803ae34a845c747b377e036f0e18af68c6d85))
+* **master:** add JSON status endpoint for external tooling ([92a8e5c](https://github.com/thnaylor/BaboViolent2/commit/92a8e5cf75aca2011f51442ac7ec9ca2539a9ad2))
+
 ## [4.5.8](https://github.com/thnaylor/BaboViolent2/compare/v4.5.7...v4.5.8) (2026-07-10)
 
 
