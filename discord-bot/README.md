@@ -35,7 +35,15 @@ npm install
 npm start
 ```
 
-**Via Docker:**
+**Via Docker (prebuilt image):**
+
+CI publishes this image to GHCR on every push to `modern`/`main` (tag `edge`) and on every release (tag `latest` + semver) — same pipeline as the game's client/dedicated/master images. Portainer, `docker run`, or a compose stack can all pull it directly:
+```
+docker run --env-file .env -v bv2-status-bot-data:/app/data ghcr.io/thnaylor/baboviolent2-bot:edge
+```
+Or add it as a service in `docker/docker-compose.yml` alongside the master, so `STATUS_URL` can just be `http://master:10208/status.json` over the compose network instead of a publicly published port.
+
+**Via Docker (building it yourself):**
 ```
 docker build -t bv2-status-bot .
 docker run --env-file .env -v bv2-status-bot-data:/app/data bv2-status-bot

@@ -134,5 +134,23 @@ services:
       PHOTON_HORIZONTAL_SHIFT: 2
       PHOTON_TYPE: 1
 
+  discord-bot:
+    image: ghcr.io/thnaylor/baboviolent2-bot:edge
+    environment:
+      # From the Discord Developer Portal -- see discord-bot/README.md.
+      DISCORD_TOKEN: ""
+      CHANNEL_ID: ""
+
+      # "master" is the service above, reached over the Docker network --
+      # avoids publishing STATUS_PORT publicly just for this bot to read it.
+      STATUS_URL: "http://master:10208/status.json"
+      POLL_INTERVAL_SECONDS: 60
+    volumes:
+      - bot-data:/app/data
+    depends_on:
+      - master
+    restart: unless-stopped
+
 volumes:
   master-data:
+  bot-data:
