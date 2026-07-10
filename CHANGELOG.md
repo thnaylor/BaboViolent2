@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.5.8](https://github.com/thnaylor/BaboViolent2/compare/v4.5.7...v4.5.8) (2026-07-10)
+
+
+### Bug Fixes
+
+* **ctf:** stop flag-event feed forcing player names to team color ([8136bbf](https://github.com/thnaylor/BaboViolent2/commit/8136bbf16e710247d959249d195caf2afaec119b))
+* **master:** remove hardcoded ban-list password ([d19b0cd](https://github.com/thnaylor/BaboViolent2/commit/d19b0cd858c296c8a26de8ea45b62872a107d07a))
+
 ## [4.5.7](https://github.com/thnaylor/BaboViolent2/compare/v4.5.6...v4.5.7) (2026-07-10)
 
 
