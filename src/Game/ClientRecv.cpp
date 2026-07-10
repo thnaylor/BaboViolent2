@@ -1031,7 +1031,7 @@ void Client::recvPacket(char * buffer, int typeID)
 						{
 							//console->add(CString("\x3> \x1%s\x8 returned the blue flag", textColorLess(game->players[flagState.playerID]->name).s));
 							//eventMessages.push_back(CString(gameVar.lang_returnBlueFlag.s, textColorLess(game->players[flagState.playerID]->name).s));
-							CString message("\x1%s\x8 returned the blue flag", game->players[flagState.playerID]->name.s);
+							CString message("\x8%s\x8 returned the blue flag", game->players[flagState.playerID]->name.s);
 							eventMessages.push_back(message);
 							console->add(CString("\x3> %s", message.s));
 						}
@@ -1039,7 +1039,7 @@ void Client::recvPacket(char * buffer, int typeID)
 						{
 							//console->add(CString("\x3> \x4%s\x8 returned the red flag", textColorLess(game->players[flagState.playerID]->name).s));
 							//eventMessages.push_back(CString(gameVar.lang_returnRedFlag.s, textColorLess(game->players[flagState.playerID]->name).s));
-							CString message("\x4%s\x8 returned the red flag", game->players[flagState.playerID]->name.s);
+							CString message("\x8%s\x8 returned the red flag", game->players[flagState.playerID]->name.s);
 							eventMessages.push_back(message);
 							console->add(CString("\x3> %s", message.s));
 						}
@@ -1067,7 +1067,7 @@ void Client::recvPacket(char * buffer, int typeID)
 						{
 							//console->add(CString("\x3> \x4%s\x8 took the blue flag", textColorLess(game->players[flagState.playerID]->name).s));
 							//eventMessages.push_back(CString(gameVar.lang_tookRedFlag.s, textColorLess(game->players[flagState.playerID]->name).s));
-							CString message("\x4%s\x8 took the blue flag", game->players[flagState.playerID]->name.s);
+							CString message("\x8%s\x8 took the blue flag", game->players[flagState.playerID]->name.s);
 							eventMessages.push_back(message);
 							console->add(CString("\x3> %s", message.s));
 						}
@@ -1075,7 +1075,7 @@ void Client::recvPacket(char * buffer, int typeID)
 						{
 							//console->add(CString("\x3> \x1%s\x8 took the red flag", textColorLess(game->players[flagState.playerID]->name).s));
 							//eventMessages.push_back(CString(gameVar.lang_tookRedFlag.s, textColorLess(game->players[flagState.playerID]->name).s));
-							CString message("\x1%s\x8 took the red flag", game->players[flagState.playerID]->name.s);
+							CString message("\x8%s\x8 took the red flag", game->players[flagState.playerID]->name.s);
 							eventMessages.push_back(message);
 							console->add(CString("\x3> %s", message.s));
 						}
@@ -1096,7 +1096,7 @@ void Client::recvPacket(char * buffer, int typeID)
 
 						if (flagState.flagID == 0)
 						{
-							CString message("\x04%s \x08scores for the Red team!", game->players[flagState.playerID]->name.s);
+							CString message("\x08%s \x08scores for the Red team!", game->players[flagState.playerID]->name.s);
 							//console->add(CString("\x3> \x4Red team scores!"));
 							//eventMessages.push_back(gameVar.lang_redScore);
 							eventMessages.push_back(message);
@@ -1106,7 +1106,7 @@ void Client::recvPacket(char * buffer, int typeID)
 						}
 						else
 						{
-							CString message("\x01%s \x08scores for the Blue team!", game->players[flagState.playerID]->name.s);
+							CString message("\x08%s \x08scores for the Blue team!", game->players[flagState.playerID]->name.s);
 							//console->add(CString("\x3>\x1 Blue team scores!"));
 							//eventMessages.push_back(gameVar.lang_blueScore);
 							eventMessages.push_back(message);
