@@ -7,6 +7,7 @@
 #include <map>
 #include "cMSstruct.h"
 #include "cMasterServer.h"
+#include "cStatusServer.h"
 #include "string.h"
 
 
@@ -36,6 +37,7 @@ public:
 	
 
 	cMasterServer	*Server;			//notre serveur
+	cStatusServer	StatusServer;			//polls-and-answers JSON status endpoint (see cStatusServer.h)
 
 	cNetManager();
 	~cNetManager();

@@ -273,6 +273,10 @@ Uses master.db and web.db in this directory. If they are empty/corrupt, run:
 
 Game servers / clients elsewhere should point bv2.db MasterServers at this host
 with Port = listen_tcp + 1000 (e.g. 11207 for 10207).
+
+Also serves a read-only JSON status endpoint (GET /status.json) on port 10208
+for external tools (e.g. discord-bot/). Set STATUS_PORT in the environment to
+change it, or STATUS_PORT=0 to disable it.
 EOF
 }
 

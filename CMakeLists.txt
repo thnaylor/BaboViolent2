@@ -280,6 +280,7 @@ set(MASTERSERVER_SOURCES
     ${MASTERSERVER_SRC_DIR}/cPacket.cpp
     ${MASTERSERVER_SRC_DIR}/cPeer.cpp
     ${MASTERSERVER_SRC_DIR}/cPeer2Peer.cpp
+    ${MASTERSERVER_SRC_DIR}/cStatusServer.cpp
     ${MASTERSERVER_SRC_DIR}/CServer.cpp
     ${MASTERSERVER_SRC_DIR}/cUDPpacket.cpp
     ${MASTERSERVER_SRC_DIR}/CThread.cpp

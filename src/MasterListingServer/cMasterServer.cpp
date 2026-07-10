@@ -883,5 +883,125 @@ cMasterServer::~cMasterServer()
 		toK	=	G;
 		G	=	G->Next;
 	}
-	
+
+}
+
+namespace
+{
+	void appendJsonEscaped(std::string &out, const char *s)
+	{
+		for (const unsigned char *p = (const unsigned char*)s; s && *p; p++)
+		{
+			switch (*p)
+			{
+				case '"':  out += "\\\""; break;
+				case '\\': out += "\\\\"; break;
+				case '\n': out += "\\n"; break;
+				case '\r': out += "\\r"; break;
+				case '\t': out += "\\t"; break;
+				default:
+					if (*p < 0x20)
+					{
+						char buf[8];
+						snprintf(buf, sizeof(buf), "\\u%04x", (unsigned)*p);
+						out += buf;
+					}
+					else
+					{
+						out += (char)*p;
+					}
+			}
+		}
+	}
+
+	// Matches the GAMETYPE_ROTATION mapping in docker/docker-compose.yml.
+	const char* GameTypeName(char gameType)
+	{
+		switch (gameType)
+		{
+			case 0: return "FFA";
+			case 1: return "TDM";
+			case 2: return "CTF";
+			case 3: return "Champion";
+			default: return 0;
+		}
+	}
+}
+
+// See discord-bot/STATUS_ENDPOINT.md for the JSON contract this must satisfy.
+std::string cMasterServer::BuildStatusJson() const
+{
+	std::string json = "{\"servers\":[";
+
+	bool first = true;
+	for (cBV2game *G = Games; G; G = G->Next)
+	{
+		if (!first) json += ",";
+		first = false;
+
+		const stBV2row &row = G->GameInfos;
+		char numBuf[16];
+
+		json += "{\"id\":\"";
+		appendJsonEscaped(json, row.ip);
+		snprintf(numBuf, sizeof(numBuf), ":%u", (unsigned)row.port);
+		json += numBuf;
+
+		json += "\",\"name\":\"";
+		appendJsonEscaped(json, row.serverName);
+
+		json += "\",\"ip\":\"";
+		appendJsonEscaped(json, row.ip);
+
+		snprintf(numBuf, sizeof(numBuf), "%u", (unsigned)row.port);
+		json += "\",\"port\":";
+		json += numBuf;
+
+		json += ",\"map\":\"";
+		appendJsonEscaped(json, row.map);
+		json += "\"";
+
+		const char *gtName = GameTypeName(row.gameType);
+		json += ",\"gameType\":";
+		if (gtName)
+		{
+			json += "\"";
+			json += gtName;
+			json += "\"";
+		}
+		else
+		{
+			snprintf(numBuf, sizeof(numBuf), "%d", (int)row.gameType);
+			json += numBuf;
+		}
+
+		snprintf(numBuf, sizeof(numBuf), "%d", (int)row.nbPlayer);
+		json += ",\"players\":";
+		json += numBuf;
+
+		snprintf(numBuf, sizeof(numBuf), "%d", (int)row.maxPlayer);
+		json += ",\"maxPlayers\":";
+		json += numBuf;
+
+		json += ",\"passworded\":";
+		json += (row.password[0] != '\0') ? "true" : "false";
+
+		json += "}";
+	}
+
+	json += "],\"updatedAt\":\"";
+
+	time_t now = time(0);
+	struct tm utc;
+#ifdef WIN32
+	gmtime_s(&utc, &now);
+#else
+	gmtime_r(&now, &utc);
+#endif
+	char timeBuf[32];
+	strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%dT%H:%M:%SZ", &utc);
+	json += timeBuf;
+	json += "\"}";
+
+	return json;
 }

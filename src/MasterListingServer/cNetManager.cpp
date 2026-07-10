@@ -20,6 +20,13 @@ void cNetManager::Init()
 
 	//on va starter le master server
 	SpawnServer(10207);
+
+	// Optional JSON status endpoint for external tools (e.g. the Discord
+	// status bot). STATUS_PORT=0 disables it; unset defaults to 10208,
+	// matching discord-bot/.env.example and STATUS_ENDPOINT.md.
+	const char *statusPortEnv = getenv("STATUS_PORT");
+	unsigned short statusPort = statusPortEnv && *statusPortEnv ? (unsigned short)atoi(statusPortEnv) : 10208;
+	StatusServer.Start(statusPort);
 }
 
 void cNetManager::SpawnServer(unsigned short listenPort)
@@ -57,7 +64,9 @@ bool cNetManager::Update(float elapsed)
 		}
 		
 		//on va pogner le data nouvellement disponible
-		RetreiveData();	
+		RetreiveData();
+
+		StatusServer.Update(elapsed, Server);
 	}
 
 	return 1;

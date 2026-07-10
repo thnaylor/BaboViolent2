@@ -46,5 +46,6 @@ exec /app/BaboMasterServer\n' > /app/entrypoint.sh \
     && chmod +x /app/entrypoint.sh
 
 EXPOSE 10207/tcp
+EXPOSE 10208/tcp
 
 ENTRYPOINT ["/app/entrypoint.sh"]

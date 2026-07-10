@@ -10,6 +10,7 @@ services:
     # self-report a public IP (SV_IP or auto-detect). Prefer a Linux host.
     ports:
       - "10207:10207/tcp"
+      - "10208:10208/tcp"
     environment:
       # Gates the cacheban/cacheunban remote-admin commands (dedicated server
       # console -> master ban-list writes). Required: with this unset, the
@@ -18,6 +19,11 @@ services:
       # pass the same value to the dedicated server's ADMIN console when using
       # those commands.
       MASTER_CACHEBAN_PASS: ""
+
+      # Read-only JSON status endpoint (GET /status.json) for external tools
+      # like discord-bot/. No auth -- don't expose it anywhere you wouldn't
+      # expose the game's own server-browser listing. 0 disables it.
+      STATUS_PORT: 10208
     volumes:
       # Mount ONLY the data dir. Mounting a named volume over /app pins the
       # container to whatever binary the volume captured on first use —

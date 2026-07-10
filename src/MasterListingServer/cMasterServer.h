@@ -15,6 +15,8 @@
 #include "cBV2game.h"
 #include "sqlite3.h"
 
+#include <string>
+
 
 	//Macros for field indexing 
 	
@@ -108,6 +110,8 @@ public:
 	int		GetBV2List(MasterClient *client);										//va pogner la liste des games de bv2, et la donner au player qui l'attend
 	int		UpdateGame(stBV2row *row,unsigned long fromID);								//met a jour un enregistrement dla DB
 	void		GetLastBV2ID();												//get the last gameID
+
+	std::string	BuildStatusJson() const;										//see discord-bot/STATUS_ENDPOINT.md for the shape
 };
 
 
