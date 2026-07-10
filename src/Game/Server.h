@@ -112,6 +112,13 @@ public:
 
 	const float maxTimeOverMaxPing;
 
+	// Max time a connection may stay in PLAYER_STATUS_LOADING (join handshake never
+	// completed) before being dropped. Heartbeat pings are skipped for players in this
+	// state to avoid kicking legit slow-loading clients, so this is the only timeout
+	// that reaps a connection that goes silent without a clean TCP close (e.g. a port
+	// scanner, or a client that crashes mid-join).
+	const float maxLoadingTime;
+
 	//const float maxIdleTime;
 
 	long frameID;

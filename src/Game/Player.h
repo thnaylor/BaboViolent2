@@ -280,6 +280,7 @@ public:
 	int avgPing;
 	float pingOverMax;
 	int currentPingFrame;
+	float loadingTime; // seconds spent stuck in PLAYER_STATUS_LOADING (handshake never completed); heartbeat pings are skipped in this state, so this is the only liveness check for it
 
 	float pingLogInterval;
 	float nextPingLogTime;

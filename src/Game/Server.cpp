@@ -39,7 +39,7 @@
 //
 // Constructeur
 //
-Server::Server(Game * pGame): maxTimeOverMaxPing(5.0f)//, maxIdleTime(180.0f)
+Server::Server(Game * pGame): maxTimeOverMaxPing(5.0f), maxLoadingTime(60.0f)//, maxIdleTime(180.0f)
 {
 	game = pGame;
 	game->isServerGame = true;
@@ -953,7 +953,26 @@ void Server::update(float delay)
 				// Still in map/handshake join path — do not run TCP heartbeat pings (avoids
 				// "no respond since 3sec" while client has not finished loading / menu).
 				if (game->players[i]->status == PLAYER_STATUS_LOADING)
+				{
+					// No heartbeat runs in this state, so a connection that never completes
+					// the join handshake (dead/crashed client, port scanner, dropped link with
+					// no clean TCP close) would otherwise occupy the slot forever. Bound it.
+					game->players[i]->loadingTime += delay;
+					if (game->players[i]->loadingTime > maxLoadingTime)
+					{
+						if( master ) master->RA_DisconnectedPlayer( textColorLess(game->players[i]->name).s, game->players[i]->playerIP, (long)game->players[i]->playerID );
+						bb_serverDisconnectClient(game->players[i]->babonetID);
+						console->add("\x3> Disconnecting client, never completed join handshake", true);
+						if (gameVar.c_netlog)
+							console->add(CString("server> [net] kick slot=%i reason=handshake_timeout (stuck in PLAYER_STATUS_LOADING for %.0fs)",
+								i, game->players[i]->loadingTime), true);
+						net_svcl_player_disconnect playerDisconnect;
+						playerDisconnect.playerID = (char)i;
+						bb_serverSend((char*)&playerDisconnect,sizeof(net_svcl_player_disconnect),NET_SVCL_PLAYER_DISCONNECT,0);
+						ZEVEN_SAFE_DELETE(game->players[i]);
+					}
 					continue;
+				}
 				// Team pick / waiting to spawn: server marks player DEAD but client may still
 				// be in intro/menu — skip heartbeat until they have spawned at least once.
 				if (game->players[i]->status == PLAYER_STATUS_DEAD &&
