@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.7.0](https://github.com/thnaylor/BaboViolent2/compare/v4.6.0...v4.7.0) (2026-07-10)
+
+
+### Features
+
+* **docker:** publish and compose the status bot image ([665e948](https://github.com/thnaylor/BaboViolent2/commit/665e948c41e892448a857e0f8073761fe4d1ff3f))
+
 ## [4.6.0](https://github.com/thnaylor/BaboViolent2/compare/v4.5.8...v4.6.0) (2026-07-10)
 
 
