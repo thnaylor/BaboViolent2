@@ -1,202 +1,160 @@
-# BaboViolent 2 (open-source tree)
+<div align="center">
 
-Headless **dedicated game server**, **master listing server**, and **graphical client** build from this repository. You still need the original **game assets** (maps, textures, sounds, etc.); see `Content/README.txt`.
+```
+  ____        _          __     ___       _            _   ____
+ | __ )  __ _| |__   ___\ \   / (_) ___ | | ___ _ __ | |_|___ \
+ |  _ \ / _` | '_ \ / _ \\ \ / /| |/ _ \| |/ _ \ '_ \| __| __) |
+ | |_) | (_| | |_) | (_) |\ V / | | (_) | |  __/ | | | |_ / __/
+ |____/ \__,_|_.__/ \___/  \_/  |_|\___/|_|\___|_| |_|\__|_____|
+```
+
+### The open-source revival of a cult-classic isometric multiplayer shooter.
+
+[![CI](https://github.com/thnaylor/BaboViolent2/actions/workflows/ci.yml/badge.svg?branch=modern)](https://github.com/thnaylor/BaboViolent2/actions/workflows/ci.yml)
+[![Docker](https://github.com/thnaylor/BaboViolent2/actions/workflows/docker.yml/badge.svg?branch=modern)](https://github.com/thnaylor/BaboViolent2/actions/workflows/docker.yml)
+[![Latest release](https://img.shields.io/github/v/release/thnaylor/BaboViolent2?label=release&color=orange)](https://github.com/thnaylor/BaboViolent2/releases/latest)
+[![License: GPLv3](https://img.shields.io/github/license/thnaylor/BaboViolent2?color=blue)](LICENSE.txt)
+
+**[⬇ Download](https://github.com/thnaylor/BaboViolent2/releases/latest)** &nbsp;·&nbsp;
+**[🎮 Game modes](#game-modes)** &nbsp;·&nbsp;
+**[🖥 Self-host a server](#self-host-a-server)** &nbsp;·&nbsp;
+**[🔨 Build from source](#build-from-source)**
+
+</div>
 
 ---
 
-## Prerequisites (Linux)
+## What is this?
 
-- **CMake** (≥ 3.10), **C++11** compiler, **OpenGL** development headers, **pthread**, **OpenSSL** (for curl), **SQLite** (bundled source is compiled in-tree).
-- **Client with audio (optional):** `SDL2_mixer` + development package (e.g. Fedora: `dnf install SDL2_mixer-devel`). CMake then links **system** `libSDL2` + `libSDL2_mixer` so the client matches the mixer ABI.
-- **Client without `SDL2_mixer`:** builds, but has no in-game audio on Linux.
+**BaboViolent 2** is a fast, top-down isometric multiplayer arena shooter, originally a title by [RNDLabs](https://www.rndlabs.ca). This repository **is the original game's source code**, now open-sourced and kept building and running on modern toolchains — same engine, same art, not a clone or reimplementation: the graphical client, the dedicated game server, and the master/listing server that ties them together.
 
 ---
 
-## Build
+## Download
+
+Grab the latest build from the **[Releases page](https://github.com/thnaylor/BaboViolent2/releases/latest)**. Each release ships several archives — pick what you need:
+
+| Package | Contents | Launch |
+|---|---|---|
+| `BaboViolent2-linux-x86_64.zip` | Client + dedicated server (Linux) | `./play.sh` (client), `./server.sh [FFA\|CTF\|TDM\|Champion]` (dedicated) |
+| `BaboViolent2-windows-x86_64.zip` | Client + dedicated server (Windows) | Double-click `BaboViolent.exe` or `BaboViolentDedicated.exe` |
+| `BaboMasterServer-linux-x86_64.zip` / `-windows-x86_64.zip` | Master / listing server, standalone | `./run.sh` (Linux) / `run.bat` (Windows) |
+| `BaboViolent2-server-<distro>-x86_64.tar.gz` | Headless dedicated server only, built per Linux distro (Debian 11/12/13, Fedora 43/44) | `./server.sh [FFA\|CTF\|TDM\|Champion]` |
+
+Unpack an archive into an empty directory and run the launcher listed above from inside it.
+
+---
+
+## Game modes
+
+| Mode | Script |
+|---|---|
+| Free-for-all | `main/LaunchScript/FFA.cfg` |
+| Team Deathmatch | `main/LaunchScript/TDM.cfg` |
+| Capture the Flag | `main/LaunchScript/CTF.cfg` |
+| Champion | `main/LaunchScript/Champion.cfg` |
+
+Launch a dedicated server straight into a mode:
 
 ```bash
-cd /path/to/BaboViolent2
+cd Content
+../BaboViolentDedicated CTF     # ≡ typing "execute CTF" at the console prompt
+```
+
+---
+
+## Self-host a server
+
+The easiest way to run your own dedicated server is **Docker** — prebuilt images are published to GHCR on every push to `modern`, and pinned per release:
+
+```
+ghcr.io/thnaylor/baboviolent2         # dedicated game server
+ghcr.io/thnaylor/baboviolent2-master  # master / listing server
+```
+
+```bash
+git clone https://github.com/thnaylor/BaboViolent2.git
+cd BaboViolent2
+docker compose -f docker/docker-compose.yml up -d
+```
+
+That brings up a master server on `10207/tcp` and a dedicated FFA server on `3334`, fully configured via environment variables (game mode, weapon tuning, admin creds, and more) — see [`docker/docker-compose.yml`](docker/docker-compose.yml) and [`docker/README.md`](docker/README.md) for the full variable reference.
+
+> Running the master on Windows/macOS Docker Desktop? Published ports mask every peer as the bridge gateway, so game servers must self-report their public IP (`SV_IP`) rather than relying on auto-detection. A native Linux Docker host avoids this entirely.
+
+Prefer running native binaries instead of containers? See [Build from source](#build-from-source) — the dedicated and master servers are plain console binaries with no GUI dependency.
+
+> **Standalone alternative:** [thnaylor/baboviolent2-server-docker](https://github.com/thnaylor/baboviolent2-server-docker) is a separate, self-contained Docker packaging of the dedicated server (same environment-variable model as above) if you'd rather not clone this whole engine repo just to host a server.
+
+---
+
+## Build from source
+
+<details>
+<summary><b>Linux</b></summary>
+
+**Prerequisites:** CMake ≥ 3.10, a C++11 compiler, OpenGL dev headers, pthread, OpenSSL (for curl). SQLite is bundled and compiled in-tree. For in-game audio, install `SDL2_mixer` + dev headers (e.g. `dnf install SDL2_mixer-devel`) — CMake links against the system `libSDL2`/`libSDL2_mixer` so the client matches the mixer ABI.
+
+```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --target BaboViolent BaboViolentDedicated BaboMasterServer -j"$(nproc)"
 ```
 
-Artifacts (typical):
+</details>
+
+<details>
+<summary><b>Windows</b></summary>
+
+**Prerequisites:** Visual Studio 2022 (or newer BuildTools) + CMake.
+
+```powershell
+cmake -S . -B build-windows -G "Visual Studio 17 2022" -A x64
+cmake --build build-windows --config Release --target BaboViolent BaboViolentDedicated
+.\scripts\package-windows.ps1
+```
+
+> Only build the `BaboViolent` and `BaboViolentDedicated` targets on Windows — `BaboMasterServer` has a Winsock conflict on that toolchain and isn't buildable there yet; run the master on Linux/Docker instead.
+
+</details>
 
 | Target | Output |
-|--------|--------|
+|---|---|
 | `BaboViolent` | Graphical client |
-| `BaboViolentDedicated` | Dedicated server (console, no SDL window) |
-| `BaboMasterServer` | TCP master / listing server (`src/MasterListingServer`) |
+| `BaboViolentDedicated` | Dedicated server (headless console) |
+| `BaboMasterServer` | TCP master / listing server |
 
----
+Binaries load `main/bv2.cfg`, `main/LaunchScript/*.cfg`, and `./bv2.db` relative to the **current working directory** — run them from a directory containing a populated `Content/` tree (or symlink `main/` next to the binary).
 
-## Working directory and assets
+### Pointing at your own master
 
-Binaries load paths such as **`main/bv2.cfg`**, **`main/LaunchScript/*.cfg`**, and **`./bv2.db`** relative to the **current working directory**.
-
-Recommended layout:
-
-1. Obtain or assemble a `Content/` tree that contains a `main/` folder (game data).
-2. Run servers and client **with cwd = that tree** (often `…/BaboViolent2/Content`):
+By default, clients and dedicated servers phone home to the public masters (`babo.hostfrog.co.za`, `babo.soh.re`) via `bv2.db` in the working directory. To point at a self-hosted master instead:
 
 ```bash
-cd /path/to/BaboViolent2/Content
-../build/BaboViolentDedicated          # dedicated
-../build/BaboMasterServer                # master server
-../build/BaboViolent                   # client
+./scripts/write-bv2-db.sh <your-master-ip>
 ```
 
-If you run from `build/`, paths like `main/bv2.cfg` will not resolve unless you symlink or copy `main` there.
+An automated smoke test (spins up a master + dedicated server and checks the handshake, no GUI required) is available at `./scripts/automated-stack-test.sh`.
 
 ---
 
-## Dedicated server (`BaboViolentDedicated`)
+## CI & releases
 
-### Startup
-
-- Loads **`main/bv2.cfg`** (via `dksvar`), initializes **BaboNet**, then opens an interactive **stdin** console (type commands, Enter).
-- **Join / TCP diagnostics:** with **`c_netlog true`** in `main/bv2.cfg` (repo default), the dedicated stdout console prints **`[net]`** lines for BaboNet handshake, map transfer, and disconnects. You can also force this on after the config load with **`BV2_NETLOG=1`** in the environment (`BV2_NETLOG=0` disables the override). The graphical client prints the same **`[net]`** lines to its in-game console when **`c_netlog`** is on.
-- Optional **first argument** is treated as a script name passed to the console as  
-  `execute <name>`  
-  which loads **`main/LaunchScript/<name>.cfg`** (do **not** include `.cfg` in the argument).
-
-Example:
-
-```bash
-cd /path/to/BaboViolent2/Content
-../build/BaboViolentDedicated CTF
-```
-
-That runs the same sequence as typing `execute CTF` at the dedicated prompt (see `src/Source/main.cpp` and `Console.cpp`).
-
-### Launch scripts
-
-Scripts live under **`main/LaunchScript/`** (e.g. `Content/main/LaunchScript/CTF.cfg`). They are line-oriented config/console commands; the file must end with a line **`endscript`** (see `Console.cpp` `execute` handler).
-
-Example snippet from `CTF.cfg`:
-
-- `set sv_*` — server variables (port, game name, limits, weapons, etc.).
-- `dedicate <map>` — start hosting on a map.
-- `addmap <map>` — rotation entries.
-- `voteon` / `novote` — voting.
-- `set zsv_adminUser` / `set zsv_adminPass` — remote admin credentials (see comments in the `.cfg` files).
-
-After editing variables, **`main/bv2.cfg`** is also rewritten on shutdown (registered `dksvar` values).
-
-### Useful console commands
-
-At the dedicated `help` / `?` prompt, the game lists topics (see `src/Source/Console.cpp`), including **`set`**, **`dedicate`**, **`execute`**, **`host`**, bans, kicks, etc.
-
----
-
-## Master server (`BaboMasterServer`)
-
-The **listing / master** binary is built from **`src/MasterListingServer/`**. It uses **BaboNet** and SQLite (compiled into the target).
-
-- **Listen port (current source):** TCP **`10207`** — set in `src/MasterListingServer/cNetManager.cpp` (`SpawnServer(10207)`). If you change it there, rebuild and open that port in your firewall.
-- Run it the same way as the dedicated server regarding **cwd** (directory containing whatever data paths it expects; typically the same `Content/` as the game so relative paths stay consistent if you add DB files beside the binaries).
-
-There is **no interactive config file** in-tree for the master process; tuning is by editing those sources and rebuilding.
-
----
-
-## Pointing clients and dedicated servers at *your* master
-
-The client and dedicated code use **`CMaster::GetMasterInfos()`** (`src/Game/Master/CMaster.cpp`), which reads **`bv2.db`** in the **current working directory**:
-
-- Table **`MasterServers`** (when present and with the expected column layout) supplies master **hostname/IP** and a **port column** interpreted as **`listenPort + 1000`** in code (`m_Port = atoi(portStr) - 1000`).
-- If **`bv2.db`** is missing or the table does not match, defaults are **`babo.soh.re`** and TCP port **`10207`** (same as the in-repo `BaboMasterServer` listen port). The release builds also include **`babo.hostfrog.co.za`** as a fallback master.
-
-**Local / self-hosted master:** insert or update **`MasterServers`** so `atoi(port) - 1000` equals your master’s listen port (e.g. for port **10207**, the stored port column should be **11207**). That overrides the public default for that install.
-
-Release packages omit **`bv2.db`**, so a dedicated started with **`./run.sh CTF`** uses the public default. If that host is unreachable you may see **`connect() failed, errno = 101`**. Point the game at your master (same machine: **`127.0.0.1`**, LAN: your master host IP, e.g. **`192.168.x.x`**):
-
-```bash
-CONTENT_DIR="$HOME/bv2-ded/Content" ./scripts/write-bv2-db.sh 192.168.1.10
-# or same host as master:
-CONTENT_DIR="$HOME/bv2-ded/Content" ./scripts/write-bv2-db.sh 127.0.0.1
-```
-
-Also ensure **BaboNet** / protocol expectations match between all three binaries (the dedicated build checks BaboNet reports version **4.0**).
-
-**Automated check (master + dedicated, no GUI):** `./scripts/automated-stack-test.sh` (frees TCP **10207**, starts a temp master, writes **127.0.0.1** into **Content/bv2.db**, runs the dedicated for a few seconds, and fails if the master drops the client immediately or **errno 101** appears).
-
----
-
-## Graphical client (`BaboViolent`)
-
-```bash
-cd /path/to/BaboViolent2/Content
-../build/BaboViolent
-```
-
-Same **cwd** rules; optional SDL2_mixer system libraries at runtime when built with mixer support.
-
----
-
-## Quick reference
-
-| Item | Location / notes |
-|------|-------------------|
-| User / server CVars | `main/bv2.cfg` (created/updated by `dksvar`) |
-| Startup scripts | `main/LaunchScript/<name>.cfg`, invoked with `execute <name>` |
-| Launcher / master DB hints | `./bv2.db` (SQLite; optional depending on feature) |
-| Dedicated auto-script | `./BaboViolentDedicated CTF` → `execute CTF` |
-| Master listen port (as shipped in sources) | TCP **10207** (`cNetManager.cpp`) |
-
-For original commercial assets and historical context, see `Content/README.txt` and https://www.rndlabs.ca/ .
-
----
-
-## CI and releases
-
-**CI** (`.github/workflows/ci.yml`) builds all three targets on **`ubuntu-latest`** for **Linux** (native), **Windows** (MinGW-w64 cross-compile), and **macOS** (osxcross cross-compile). Each platform produces three archives uploaded as workflow artifacts:
-
-| Package | Contents |
-|---------|----------|
-| `BaboViolent-client-<os>-<arch>.tar.gz` / `.zip` | Client binary, `Content/`, launcher |
-| `BaboViolent-dedicated-<os>-<arch>.tar.gz` / `.zip` | Dedicated binary, `Content/`, launcher |
-| `BaboMasterServer-<os>-<arch>.tar.gz` / `.zip` | Master binary, `master.db`, `web.db`, bootstrap SQL |
-
-Linux and macOS ship **`.tar.gz`**; Windows ships **`.zip`**. Unpack into an empty directory and run `./run.sh` (or `run.bat` on Windows).
-
-### Automated releases (release-please)
-
-**[release-please](https://github.com/googleapis/release-please)** (`.github/workflows/release-please.yml`) watches **`modern`** and **`main`** for [Conventional Commits](https://www.conventionalcommits.org/):
-
-| Commit prefix | Version bump |
-|---------------|--------------|
-| `fix:` | patch |
-| `feat:` | minor |
-| `feat!:` or `BREAKING CHANGE:` in body | major |
-
-On each qualifying push it opens or updates a **Release PR** that bumps `.github/.release-please-manifest.json`, updates **`CHANGELOG.md`**, and prepares the next tag (e.g. `v0.1.0`).
-
-**To ship a release:** merge the Release PR. release-please creates the GitHub Release and tag; **`.github/workflows/release.yml`** then builds all nine platform packages and uploads them to that release.
-
-Example commit messages:
+- **CI** (`ci.yml`) builds the client + dedicated server for Linux and Windows, and the dedicated + master servers across five Linux distros, on every push and PR.
+- **Releases** are driven by [release-please](https://github.com/googleapis/release-please) watching [Conventional Commits](https://www.conventionalcommits.org/) on `modern`/`main` — merging its release PR cuts a GitHub Release and triggers the full build/package/upload pipeline automatically.
+- **Docker images** are rebuilt and pushed to GHCR on every push to `modern`/`main` (tag: `edge`) and on every published release (tag: matching semver + `latest`).
 
 ```text
-feat: add FFA launch script
-fix: ignore speed-hack kick on dedicated server
-feat!: change default master listen port
+fix: ...              → patch release
+feat: ...             → minor release
+feat!: ... /
+BREAKING CHANGE: ...  → major release
 ```
 
-**Local packaging** (native Linux build, or cross-build via `scripts/ci-build.sh`):
+---
 
-```bash
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --target BaboViolent BaboViolentDedicated BaboMasterServer -j
-BV2_PLATFORM=linux ./scripts/package-release.sh    # dist/*.tar.gz
+## Credits
 
-# Cross-compile from Linux (same as CI):
-sudo apt-get install g++-mingw-w64-x86-64 mingw-w64-tools   # Windows
-BV2_PLATFORM=windows BUILD=build-windows ./scripts/ci-build.sh
-BV2_PLATFORM=windows BUILD=build-windows ./scripts/package-release.sh
+- Original **BaboViolent 2** by [RNDLabs](https://www.rndlabs.ca).
+- Open-source engine maintained here by [@thnaylor](https://github.com/thnaylor), forked from [Jmainguy/BaboViolent2](https://github.com/Jmainguy/BaboViolent2).
 
-# macOS cross requires osxcross (see mbround18/setup-osxcross); CI installs it automatically.
-BV2_PLATFORM=macos BUILD=build-macos ./scripts/ci-build.sh
-BV2_PLATFORM=macos BUILD=build-macos ./scripts/package-release.sh
-```
-
-Legacy Linux helper: `./scripts/package-linux-distributions.sh` (same as `BV2_PLATFORM=linux`).
+Licensed under the [GNU GPLv3](LICENSE.txt).
