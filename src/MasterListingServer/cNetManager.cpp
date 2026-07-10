@@ -217,8 +217,11 @@ void cNetManager::ReceiveServerPacket(char *data,int typeID,unsigned long fromID
 			stCacheBan cb;
 			memcpy(&cb,data,sizeof(stCacheBan));
 
-			//check validity of the password
-			if( strcmp(cb.Pass,"roxbabo"))
+			// Check validity of the password against MASTER_CACHEBAN_PASS. Fail closed
+			// (no built-in default) -- this used to be a hardcoded literal, which is a
+			// public constant to anyone reading this open-source repo.
+			const char *cacheBanPass = getenv("MASTER_CACHEBAN_PASS");
+			if( !cacheBanPass || !cacheBanPass[0] || strcmp(cb.Pass,cacheBanPass) )
 			{
 				return;
 			}
@@ -232,8 +235,11 @@ void cNetManager::ReceiveServerPacket(char *data,int typeID,unsigned long fromID
 			stCacheUnban cb;
 			memcpy(&cb,data,sizeof(stCacheUnban));
 
-			//check validity of the password
-			if( strcmp(cb.Pass,"roxbabo"))
+			// Check validity of the password against MASTER_CACHEBAN_PASS. Fail closed
+			// (no built-in default) -- this used to be a hardcoded literal, which is a
+			// public constant to anyone reading this open-source repo.
+			const char *cacheBanPass = getenv("MASTER_CACHEBAN_PASS");
+			if( !cacheBanPass || !cacheBanPass[0] || strcmp(cb.Pass,cacheBanPass) )
 			{
 				return;
 			}

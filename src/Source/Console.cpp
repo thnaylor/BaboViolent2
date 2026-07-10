@@ -2094,11 +2094,9 @@ void Console::sendCommand(CString commandLine, bool isAdmin, unsigned long bbnet
 		if (scene->server)
 		{
 			CString strPass = tokenize.getFirstToken(' ');
-// 			if( strPass != "roxbabo" )
-// 			{
-// 				return;
-// 			}
-				
+			// Password is validated master-side against MASTER_CACHEBAN_PASS; this
+			// just forwards whatever the admin typed.
+
 			CString strID = tokenize.getFirstToken(' ');
 			if( strID == "" )
 			{

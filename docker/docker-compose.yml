@@ -10,6 +10,14 @@ services:
     # self-report a public IP (SV_IP or auto-detect). Prefer a Linux host.
     ports:
       - "10207:10207/tcp"
+    environment:
+      # Gates the cacheban/cacheunban remote-admin commands (dedicated server
+      # console -> master ban-list writes). Required: with this unset, the
+      # master rejects all cacheban/cacheunban requests (fails closed) rather
+      # than falling back to any built-in value. Set your own secret here and
+      # pass the same value to the dedicated server's ADMIN console when using
+      # those commands.
+      MASTER_CACHEBAN_PASS: ""
     volumes:
       # Mount ONLY the data dir. Mounting a named volume over /app pins the
       # container to whatever binary the volume captured on first use —
