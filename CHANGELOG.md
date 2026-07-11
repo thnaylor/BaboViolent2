@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.7.1](https://github.com/thnaylor/BaboViolent2/compare/v4.7.0...v4.7.1) (2026-07-11)
+
+
+### Bug Fixes
+
+* **master:** strip inline color codes from status endpoint names ([08baf64](https://github.com/thnaylor/BaboViolent2/commit/08baf647cfb2798d8006ea7c5249ac380fa9e234))
+
 ## [4.7.0](https://github.com/thnaylor/BaboViolent2/compare/v4.6.0...v4.7.0) (2026-07-10)
 
 
