@@ -139,12 +139,16 @@ services:
     environment:
       # From the Discord Developer Portal -- see discord-bot/README.md.
       DISCORD_TOKEN: ""
-      CHANNEL_ID: ""
 
       # "master" is the service above, reached over the Docker network --
       # avoids publishing STATUS_PORT publicly just for this bot to read it.
       STATUS_URL: "http://master:10208/status.json"
       POLL_INTERVAL_SECONDS: 60
+
+      # Any Discord server can add the bot and run /setup themselves --
+      # CHANNEL_ID isn't needed unless migrating an existing single-channel
+      # deployment (see discord-bot/.env.example).
+      # CHANNEL_ID: ""
     volumes:
       - bot-data:/app/data
     depends_on:
