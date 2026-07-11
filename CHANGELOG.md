@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.8.1](https://github.com/thnaylor/BaboViolent2/compare/v4.8.0...v4.8.1) (2026-07-11)
+
+
+### Bug Fixes
+
+* **server:** stop kicking real spectators via handshake-timeout watchdog ([0feafb1](https://github.com/thnaylor/BaboViolent2/commit/0feafb12faf678dac9146e36f8196986a9499f91))
+
 ## [4.8.0](https://github.com/thnaylor/BaboViolent2/compare/v4.7.1...v4.8.0) (2026-07-11)
 
 
