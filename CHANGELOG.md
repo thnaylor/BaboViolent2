@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.8.0](https://github.com/thnaylor/BaboViolent2/compare/v4.7.1...v4.8.0) (2026-07-11)
+
+
+### Features
+
+* **discord-bot:** make the bot multi-server via /setup ([69b9f90](https://github.com/thnaylor/BaboViolent2/commit/69b9f907952b0012540d17c625f7500b20e43688))
+
 ## [4.7.1](https://github.com/thnaylor/BaboViolent2/compare/v4.7.0...v4.7.1) (2026-07-11)
 
 
