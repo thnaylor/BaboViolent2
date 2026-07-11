@@ -954,22 +954,33 @@ void Server::update(float delay)
 				// "no respond since 3sec" while client has not finished loading / menu).
 				if (game->players[i]->status == PLAYER_STATUS_LOADING)
 				{
-					// No heartbeat runs in this state, so a connection that never completes
-					// the join handshake (dead/crashed client, port scanner, dropped link with
-					// no clean TCP close) would otherwise occupy the slot forever. Bound it.
-					game->players[i]->loadingTime += delay;
-					if (game->players[i]->loadingTime > maxLoadingTime)
+					// PLAYER_STATUS_LOADING is also the resting state for a legitimate
+					// spectator who completed the join handshake but never spawns (spawn()
+					// is the only other place status leaves LOADING besides kill(), and
+					// kill() only fires on an actual team change — spectator is the default
+					// team, so a client that just watches never triggers it). Only bound the
+					// time spent *before* the handshake finishes; once handshakeComplete is
+					// set, treat it like any other non-playing spectator and skip liveness
+					// checks indefinitely (same exemption as the DEAD/never-alive case below).
+					if (!game->players[i]->handshakeComplete)
 					{
-						if( master ) master->RA_DisconnectedPlayer( textColorLess(game->players[i]->name).s, game->players[i]->playerIP, (long)game->players[i]->playerID );
-						bb_serverDisconnectClient(game->players[i]->babonetID);
-						console->add("\x3> Disconnecting client, never completed join handshake", true);
-						if (gameVar.c_netlog)
-							console->add(CString("server> [net] kick slot=%i reason=handshake_timeout (stuck in PLAYER_STATUS_LOADING for %.0fs)",
-								i, game->players[i]->loadingTime), true);
-						net_svcl_player_disconnect playerDisconnect;
-						playerDisconnect.playerID = (char)i;
-						bb_serverSend((char*)&playerDisconnect,sizeof(net_svcl_player_disconnect),NET_SVCL_PLAYER_DISCONNECT,0);
-						ZEVEN_SAFE_DELETE(game->players[i]);
+						// No heartbeat runs in this state, so a connection that never completes
+						// the join handshake (dead/crashed client, port scanner, dropped link with
+						// no clean TCP close) would otherwise occupy the slot forever. Bound it.
+						game->players[i]->loadingTime += delay;
+						if (game->players[i]->loadingTime > maxLoadingTime)
+						{
+							if( master ) master->RA_DisconnectedPlayer( textColorLess(game->players[i]->name).s, game->players[i]->playerIP, (long)game->players[i]->playerID );
+							bb_serverDisconnectClient(game->players[i]->babonetID);
+							console->add("\x3> Disconnecting client, never completed join handshake", true);
+							if (gameVar.c_netlog)
+								console->add(CString("server> [net] kick slot=%i reason=handshake_timeout (stuck in PLAYER_STATUS_LOADING for %.0fs)",
+									i, game->players[i]->loadingTime), true);
+							net_svcl_player_disconnect playerDisconnect;
+							playerDisconnect.playerID = (char)i;
+							bb_serverSend((char*)&playerDisconnect,sizeof(net_svcl_player_disconnect),NET_SVCL_PLAYER_DISCONNECT,0);
+							ZEVEN_SAFE_DELETE(game->players[i]);
+						}
 					}
 					continue;
 				}

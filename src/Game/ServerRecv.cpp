@@ -335,6 +335,7 @@ void Server::recvPacket(char * buffer, int typeID, unsigned long bbnetID)
 				// Join handshake completed: reset ping watchdog so we do not inherit pre-accept counts.
 				game->players[gameVersionAccepted.playerID]->waitForPong = false;
 				game->players[gameVersionAccepted.playerID]->currentPingFrame = 0;
+				game->players[gameVersionAccepted.playerID]->handshakeComplete = true;
 				// On envoi �CE player l'info sur la game
 				net_svcl_server_info serverInfo;
 				serverInfo.mapSeed = 0; // Pour l'instant on mettra rien (on va mettre le non dla map bientot)

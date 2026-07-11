@@ -281,6 +281,7 @@ public:
 	float pingOverMax;
 	int currentPingFrame;
 	float loadingTime; // seconds spent stuck in PLAYER_STATUS_LOADING (handshake never completed); heartbeat pings are skipped in this state, so this is the only liveness check for it
+	bool handshakeComplete; // set once NET_CLSV_GAMEVERSION_ACCEPTED is processed; distinguishes "still doing the join handshake" from "connected and just sitting as a spectator" — both look like PLAYER_STATUS_LOADING since spectators never spawn()
 
 	float pingLogInterval;
 	float nextPingLogTime;

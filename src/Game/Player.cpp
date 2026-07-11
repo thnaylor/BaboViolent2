@@ -160,6 +160,7 @@ Player::Player(char pPlayerID, Map * pMap, Game * pGame): pingLogInterval(0.05f)
 	nbMolotovLeft = 1; // On commence toujours avec 1 molotov
 	currentPingFrame = 0;
 	loadingTime = 0.0f;
+	handshakeComplete = false;
 	connectionInterrupted = false;
 	spawnRequested = false;
 #ifndef DEDICATED_SERVER
