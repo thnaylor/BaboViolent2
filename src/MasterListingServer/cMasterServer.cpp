@@ -892,6 +892,13 @@ namespace
 	{
 		for (const unsigned char *p = (const unsigned char*)s; s && *p; p++)
 		{
+			// Bytes below 0x10 are the client's inline text-color codes (see
+			// textColorLess() in src/Source/Helper.cpp), not real content --
+			// drop them the same way the game's own renderer does, rather
+			// than leaking them into JSON as \u00XX. '\n' is kept, matching
+			// that same function's one exception.
+			if (*p < 0x10 && *p != '\n') continue;
+
 			switch (*p)
 			{
 				case '"':  out += "\\\""; break;
