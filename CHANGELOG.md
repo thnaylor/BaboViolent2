@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.8.2](https://github.com/thnaylor/BaboViolent2/compare/v4.8.1...v4.8.2) (2026-08-02)
+
+
+### Bug Fixes
+
+* **net:** stop full server shutdown on a single client send failure ([deac677](https://github.com/thnaylor/BaboViolent2/commit/deac677f259994e24770da0f006bd9bf2e3f68c2))
+
 ## [4.8.1](https://github.com/thnaylor/BaboViolent2/compare/v4.8.0...v4.8.1) (2026-07-11)
 
 
