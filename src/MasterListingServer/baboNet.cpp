@@ -221,8 +221,9 @@ long bb_serverUpdate(float elapsed,int updateMsg,char* newIP)
 		case UPDATE_SEND_RECV: //on update les Send ET les Receive
 		{
 			//envoyer le stock TCP/UDP
-			if(Server->SendPacketsToClients()) return BBNET_ERROR;
-			
+			long sendResult = Server->SendPacketsToClients();
+			if(sendResult) return sendResult;
+
 			//recevoir TCP/UDP
 			long r = Server->ReceivePacketsFromClients();
 			if(r) return r;
@@ -236,7 +237,8 @@ long bb_serverUpdate(float elapsed,int updateMsg,char* newIP)
 		case UPDATE_SEND: //on update que les send
 		{
 			//on envoie le stock TCP/UDP
-			if(Server->SendPacketsToClients()) return -999999999;
+			long sendResult = Server->SendPacketsToClients();
+			if(sendResult) return sendResult;
 			return 0;
 		}
 		case UPDATE_RECV: //on update que les recv
